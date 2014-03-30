@@ -1,6 +1,3 @@
-### COMING SOON
-This project is still in construction...
-
 ### Welcome to Tindio.
 Tindio is a production and workflow management platform for Film and VFX projects for small groups of people. It's build on a 'Project', 'Scene', 'Shot', 'Task' hierarchy and therefor has some roles to use like 'Admin', 'Director', 'Supervisor' and 'Artist'.
 
