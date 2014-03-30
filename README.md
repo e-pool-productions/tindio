@@ -1,5 +1,5 @@
 ### Tindio - the tiny studio.
-Tindio is a production and workflow management platform for Film and VFX projects based on the codeigniter framework. It was build for small groups of people which want to organize their projects without using oversized programms designed primarily for large groups. It's build on a 'Project', 'Scene', 'Shot', 'Task' hierarchy and therefor has some roles like 'Admin', 'Director', 'Supervisor' and 'Artist'.
+Tindio is a production and workflow management platform for Film and VFX projects based on the codeigniter framework. It was build for small groups of people which want to organize their projects without using oversized programms designed primarily for a large amount of people. It's build on a 'Project', 'Scene', 'Shot', 'Task' hierarchy and therefor has some roles like 'Admin', 'Director', 'Supervisor' and 'Artist'.
 
 ### Features
 After you logged in into your working space you will find the dashboard with all important information like 'New Projects', 'My Deadlines' or 'Notifications' and a global overview of the projects on Tindio.
