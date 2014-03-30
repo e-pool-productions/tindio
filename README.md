@@ -23,7 +23,16 @@ define('URL', 'http://www.example.com');
 
 (NOTICE! SINCE YOU WILL DEAL WITH DIFFERENT ACCOUNTS IT'S HIGHLY RECOMMENDED TO USE SSL FOR MORE SECURITY! WE CAN'T PROVIDE THAT FOR YOU!)
 
-Now go to application/config/database.php and fill hostname, username, password and database with your information. At last login to your database management system (e.g. phpMyAdmin) and import tindio.sql.
+Now go to application/config/database.php and fill with your information:
+```
+$db['default']['hostname'] = 'localhost';       // your database hostlocation (normally localhost)
+$db['default']['username'] = 'username';        // your database username
+$db['default']['password'] = 'password';        // your database password
+$db['default']['database'] = 'tindio';          // the name of your database
+```
+Please keep the ' and just change the information inside after the equals.
+
+At last login to your database management system (e.g. phpMyAdmin) and import tindio.sql.
 After you have done that just upload all files and folders to your webhosting Service.
 That's it!
 
