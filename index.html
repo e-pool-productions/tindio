@@ -39,36 +39,44 @@
         </div>
 
         <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+<a name="welcome-to-tindio" class="anchor" href="#welcome-to-tindio"><span class="octicon octicon-link"></span></a>Welcome to Tindio.</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<p>Tindio is a production and workflow management platform for Film and VFX projects for small groups of people. It's build on a 'Project', 'Scene', 'Shot', 'Task' hierarchy and therefor has some roles to use like 'Admin', 'Director', 'Supervisor' and 'Artist'.</p>
 
 <h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>After you logged in into your working space you will find the dashboard with all important information like 'New Projects', 'My Deadlines' or 'Notifications' and a global overview of the projects on Tindio.
+You will have an area where you can see all your projects, assets and your current work to do. Moreover there are some usefull tools which will help you to either simplify your work or keep track of your deadlines. With the 'Workflow Editor' it's fast and simple to predefine some tasks. Later all you have to do is to add the workflow to a shot.</p>
 
 <h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<a name="what-do-i-need" class="anchor" href="#what-do-i-need"><span class="octicon octicon-link"></span></a>What do I need?</h3>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>Tindio is a very simple and easy to use platform. All you need is
+1. a webhosting Service or Server where you can upload your copy to
+2. a mySQL-Database</p>
+
+<h3>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h3>
+
+<p>Download the .zip file and unpack it. Next go to application/config/constants.php and change the url of define('URL', 'http://localhost/tindio/'); to whatever url you have. For example if your server runs under <a href="http://www.example.com">http://www.example.com</a> then you will change it to define('URL', '<a href="http://www.example.com'">http://www.example.com'</a>); (NOTICE! SINCE YOU WILL DEAL WITH DIFFERENT ACCOUNTS IT'S HIGHLY RECOMMENDED TO USE SSL FOR MORE SECURITY! WE CAN'T PROVIDE THAT FOR YOU!)
+Now go to application/config/database.php and fill hostname, username, password and database with your information. At last login to your database management system (e.g. phpMyAdmin) and import tindio.sql.
+After you have done that just upload all files and folders to your webhosting Service.
+That's it!</p>
+
+<h3>
+<a name="how-do-i-start" class="anchor" href="#how-do-i-start"><span class="octicon octicon-link"></span></a>How do I start?</h3>
+
+<p>Since you need an account to work with Tindio there is an default account with administration rights.
+Username: Admin
+Password: administrator
+PLEASE! AFTER YOU LOGGED IN THE FIRST TIME CHANGE THE PASSWORD FOR THE ADMINISTRATOR ACCOUNT!</p>
 
 <h3>
 <a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+<p>Tindio was created by Martin Möller (<a href="https://github.com/Fragfire" class="user-mention">@Fragfire</a>), Maurice Wendt, Lukas Fey (<a href="https://github.com/kunostatos" class="user-mention">@kunostatos</a>) and Dominik Gopp.
+Initiator of the project was Nelson Gonçalves</p>
       </section>
 
     </div>
