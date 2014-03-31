@@ -16,7 +16,7 @@ Tindio is a very simple and easy to use platform. All you need is
 ### How to install?
 Download the .zip file and unpack it. Next go to application/config/constants.php and change the url of
 ```
-define('URL', 'http://localhost/tindio/');
+define('URL', 'http://localhost/tindio/ci');
 ```
 to whatever url you have. For example if your server runs under http://www.example.com then you will change it to
 ```
@@ -34,8 +34,7 @@ $db['default']['database'] = 'tindio';          // the name of your database
 ```
 Please keep the ' and just change the information inside after the equals.
 
-At last login to your database management system (e.g. phpMyAdmin) and import tindio.sql.
-After you have done that just upload all files and folders to your webhosting Service.
+At last, login to your database management system (e.g. phpMyAdmin) and import tindio.sql. You will find it in the database folder. After you have done that just upload all files and folders in the ci folder to your webhosting Service.
 That's it!
 
 ### How do I start?
