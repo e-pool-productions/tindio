@@ -30,7 +30,9 @@ Now go to ci/application/config/database.php and fill the following with your in
 $db['default']['hostname'] = 'localhost';       // your database hostlocation (normally localhost)
 $db['default']['username'] = 'username';        // your database username
 $db['default']['password'] = 'password';        // your database password
-$db['default']['database'] = 'tindio';          // the name of your database
+$db['default']['database'] = 'tindio';          // the name of the database
+                                                // (if you dont want to change the name
+                                                //  of the database just leave it as it is)
 ```
 Please keep the ' and just change the information inside after the equals.
 
