@@ -45,7 +45,7 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 |
 */
 
-define('URL', 'http://localhost/lw95kose-bp/ci/');
+define('URL', 'http://localhost/tindio/ci/');
 define('IMG', URL.'img/');
 define('CSS', URL.'css/');
 define('JS', URL.'js/');
