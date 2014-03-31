@@ -1,0 +1,2 @@
+<p>Copyright © 2014 <a href="http://e-pool-productions.github.io" target="_blank">E-Pool Productions</a><br/>
+Licenced under <a href="http://www.gnu.org/licenses/gpl-3.0.html" target="_blank">GPLv3</a></p>
