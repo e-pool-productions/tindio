@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Erstellungszeit: 31. Mrz 2014 um 13:19
--- Server Version: 5.6.11-log
--- PHP-Version: 5.4.15
+-- Generation Time: May 17, 2014 at 01:57 PM
+-- Server version: 5.6.11-log
+-- PHP Version: 5.4.15
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Datenbank: `tindio`
+-- Database: `tindio`
 --
 CREATE DATABASE IF NOT EXISTS `tindio` DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 USE `tindio`;
@@ -25,7 +25,7 @@ USE `tindio`;
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `admin`
+-- Table structure for table `admin`
 --
 
 CREATE TABLE IF NOT EXISTS `admin` (
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `admin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `admin`
+-- Dumping data for table `admin`
 --
 
 INSERT INTO `admin` (`username`) VALUES
@@ -43,7 +43,7 @@ INSERT INTO `admin` (`username`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `asset`
+-- Table structure for table `asset`
 --
 
 CREATE TABLE IF NOT EXISTS `asset` (
@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS `asset` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `assettype`
+-- Table structure for table `assettype`
 --
 
 CREATE TABLE IF NOT EXISTS `assettype` (
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `assettype` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `assettype`
+-- Dumping data for table `assettype`
 --
 
 INSERT INTO `assettype` (`assettype_id`, `type_name`) VALUES
@@ -88,7 +88,7 @@ INSERT INTO `assettype` (`assettype_id`, `type_name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `category`
+-- Table structure for table `category`
 --
 
 CREATE TABLE IF NOT EXISTS `category` (
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `category` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=5 ;
 
 --
--- Daten für Tabelle `category`
+-- Dumping data for table `category`
 --
 
 INSERT INTO `category` (`category_id`, `title`) VALUES
@@ -111,7 +111,7 @@ INSERT INTO `category` (`category_id`, `title`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `comment`
+-- Table structure for table `comment`
 --
 
 CREATE TABLE IF NOT EXISTS `comment` (
@@ -127,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `comment` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `globallog`
+-- Table structure for table `globallog`
 --
 
 CREATE TABLE IF NOT EXISTS `globallog` (
@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `globallog` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `logtype`
+-- Table structure for table `logtype`
 --
 
 CREATE TABLE IF NOT EXISTS `logtype` (
@@ -152,7 +152,7 @@ CREATE TABLE IF NOT EXISTS `logtype` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `logtype`
+-- Dumping data for table `logtype`
 --
 
 INSERT INTO `logtype` (`logtype_id`, `event`) VALUES
@@ -165,7 +165,7 @@ INSERT INTO `logtype` (`logtype_id`, `event`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `project`
+-- Table structure for table `project`
 --
 
 CREATE TABLE IF NOT EXISTS `project` (
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS `project` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `projectasset`
+-- Table structure for table `projectasset`
 --
 
 CREATE TABLE IF NOT EXISTS `projectasset` (
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS `projectasset` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `projectobserver`
+-- Table structure for table `projectobserver`
 --
 
 CREATE TABLE IF NOT EXISTS `projectobserver` (
@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS `projectobserver` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `projecttype`
+-- Table structure for table `projecttype`
 --
 
 CREATE TABLE IF NOT EXISTS `projecttype` (
@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS `projecttype` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `scene`
+-- Table structure for table `scene`
 --
 
 CREATE TABLE IF NOT EXISTS `scene` (
@@ -253,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `scene` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `sceneasset`
+-- Table structure for table `sceneasset`
 --
 
 CREATE TABLE IF NOT EXISTS `sceneasset` (
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS `sceneasset` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `shot`
+-- Table structure for table `shot`
 --
 
 CREATE TABLE IF NOT EXISTS `shot` (
@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `shot` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `shotasset`
+-- Table structure for table `shotasset`
 --
 
 CREATE TABLE IF NOT EXISTS `shotasset` (
@@ -307,7 +307,7 @@ CREATE TABLE IF NOT EXISTS `shotasset` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `skill`
+-- Table structure for table `skill`
 --
 
 CREATE TABLE IF NOT EXISTS `skill` (
@@ -317,7 +317,7 @@ CREATE TABLE IF NOT EXISTS `skill` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=4 ;
 
 --
--- Daten für Tabelle `skill`
+-- Dumping data for table `skill`
 --
 
 INSERT INTO `skill` (`skill_id`, `title`) VALUES
@@ -327,7 +327,7 @@ INSERT INTO `skill` (`skill_id`, `title`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `status`
+-- Table structure for table `status`
 --
 
 CREATE TABLE IF NOT EXISTS `status` (
@@ -337,7 +337,7 @@ CREATE TABLE IF NOT EXISTS `status` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `status`
+-- Dumping data for table `status`
 --
 
 INSERT INTO `status` (`status_id`, `title`) VALUES
@@ -350,7 +350,7 @@ INSERT INTO `status` (`status_id`, `title`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `task`
+-- Table structure for table `task`
 --
 
 CREATE TABLE IF NOT EXISTS `task` (
@@ -374,7 +374,7 @@ CREATE TABLE IF NOT EXISTS `task` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `taskasset`
+-- Table structure for table `taskasset`
 --
 
 CREATE TABLE IF NOT EXISTS `taskasset` (
@@ -390,7 +390,7 @@ CREATE TABLE IF NOT EXISTS `taskasset` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE IF NOT EXISTS `user` (
@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `user`
+-- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`lastname`, `firstname`, `username`, `password`, `mail`, `lastaccess`, `gravatar_email`, `newassignments`, `creationtime`, `timezone`) VALUES
@@ -417,7 +417,7 @@ INSERT INTO `user` (`lastname`, `firstname`, `username`, `password`, `mail`, `la
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `userproject`
+-- Table structure for table `userproject`
 --
 
 CREATE TABLE IF NOT EXISTS `userproject` (
@@ -431,7 +431,7 @@ CREATE TABLE IF NOT EXISTS `userproject` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `userscene`
+-- Table structure for table `userscene`
 --
 
 CREATE TABLE IF NOT EXISTS `userscene` (
@@ -444,7 +444,7 @@ CREATE TABLE IF NOT EXISTS `userscene` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `usershot`
+-- Table structure for table `usershot`
 --
 
 CREATE TABLE IF NOT EXISTS `usershot` (
@@ -457,7 +457,7 @@ CREATE TABLE IF NOT EXISTS `usershot` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `userskill`
+-- Table structure for table `userskill`
 --
 
 CREATE TABLE IF NOT EXISTS `userskill` (
@@ -470,7 +470,7 @@ CREATE TABLE IF NOT EXISTS `userskill` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `usertask`
+-- Table structure for table `usertask`
 --
 
 CREATE TABLE IF NOT EXISTS `usertask` (
@@ -486,12 +486,12 @@ CREATE TABLE IF NOT EXISTS `usertask` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `workflow`
+-- Table structure for table `workflow`
 --
 
 CREATE TABLE IF NOT EXISTS `workflow` (
   `workflow_id` int(11) NOT NULL AUTO_INCREMENT,
-  `title` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `title` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `username` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`workflow_id`),
   UNIQUE KEY `title` (`title`),
@@ -499,7 +499,7 @@ CREATE TABLE IF NOT EXISTS `workflow` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=110 ;
 
 --
--- Daten für Tabelle `workflow`
+-- Dumping data for table `workflow`
 --
 
 INSERT INTO `workflow` (`workflow_id`, `title`, `username`) VALUES
@@ -511,20 +511,20 @@ INSERT INTO `workflow` (`workflow_id`, `title`, `username`) VALUES
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `workflowstructure`
+-- Table structure for table `workflowstructure`
 --
 
 CREATE TABLE IF NOT EXISTS `workflowstructure` (
   `workflow_id` int(11) NOT NULL,
   `orderposition` int(11) NOT NULL,
-  `task_title` varchar(11) COLLATE utf8_unicode_ci NOT NULL,
+  `task_title` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`orderposition`,`workflow_id`),
   KEY `workflow_id` (`workflow_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
--- Daten für Tabelle `workflowstructure`
+-- Dumping data for table `workflowstructure`
 --
 
 INSERT INTO `workflowstructure` (`workflow_id`, `orderposition`, `task_title`, `description`) VALUES
@@ -573,35 +573,35 @@ INSERT INTO `workflowstructure` (`workflow_id`, `orderposition`, `task_title`, `
 (105, 11, 'Rendering', '');
 
 --
--- Constraints der exportierten Tabellen
+-- Constraints for dumped tables
 --
 
 --
--- Constraints der Tabelle `admin`
+-- Constraints for table `admin`
 --
 ALTER TABLE `admin`
   ADD CONSTRAINT `admin_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `asset`
+-- Constraints for table `asset`
 --
 ALTER TABLE `asset`
   ADD CONSTRAINT `asset_ibfk_1` FOREIGN KEY (`type_id`) REFERENCES `assettype` (`assettype_id`);
 
 --
--- Constraints der Tabelle `comment`
+-- Constraints for table `comment`
 --
 ALTER TABLE `comment`
   ADD CONSTRAINT `comment_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `globallog`
+-- Constraints for table `globallog`
 --
 ALTER TABLE `globallog`
   ADD CONSTRAINT `globallog_ibfk_1` FOREIGN KEY (`logtype_id`) REFERENCES `logtype` (`logtype_id`);
 
 --
--- Constraints der Tabelle `project`
+-- Constraints for table `project`
 --
 ALTER TABLE `project`
   ADD CONSTRAINT `project_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -609,21 +609,21 @@ ALTER TABLE `project`
   ADD CONSTRAINT `project_ibfk_3` FOREIGN KEY (`logo`) REFERENCES `asset` (`asset_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `projectasset`
+-- Constraints for table `projectasset`
 --
 ALTER TABLE `projectasset`
   ADD CONSTRAINT `projectasset_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`),
   ADD CONSTRAINT `projectasset_ibfk_2` FOREIGN KEY (`asset_id`) REFERENCES `asset` (`asset_id`);
 
 --
--- Constraints der Tabelle `projectobserver`
+-- Constraints for table `projectobserver`
 --
 ALTER TABLE `projectobserver`
   ADD CONSTRAINT `projectobserver_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON UPDATE CASCADE,
   ADD CONSTRAINT `projectobserver_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
--- Constraints der Tabelle `scene`
+-- Constraints for table `scene`
 --
 ALTER TABLE `scene`
   ADD CONSTRAINT `scene_ibfk_2` FOREIGN KEY (`status_id`) REFERENCES `status` (`status_id`),
@@ -631,14 +631,14 @@ ALTER TABLE `scene`
   ADD CONSTRAINT `scene_ibfk_4` FOREIGN KEY (`logo`) REFERENCES `asset` (`asset_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `sceneasset`
+-- Constraints for table `sceneasset`
 --
 ALTER TABLE `sceneasset`
   ADD CONSTRAINT `sceneasset_ibfk_1` FOREIGN KEY (`scene_id`) REFERENCES `scene` (`scene_id`),
   ADD CONSTRAINT `sceneasset_ibfk_2` FOREIGN KEY (`asset_id`) REFERENCES `asset` (`asset_id`) ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `shot`
+-- Constraints for table `shot`
 --
 ALTER TABLE `shot`
   ADD CONSTRAINT `shot_ibfk_2` FOREIGN KEY (`scene_id`) REFERENCES `scene` (`scene_id`),
@@ -647,14 +647,14 @@ ALTER TABLE `shot`
   ADD CONSTRAINT `shot_ibfk_5` FOREIGN KEY (`status_id`) REFERENCES `status` (`status_id`);
 
 --
--- Constraints der Tabelle `shotasset`
+-- Constraints for table `shotasset`
 --
 ALTER TABLE `shotasset`
   ADD CONSTRAINT `shotasset_ibfk_1` FOREIGN KEY (`shot_id`) REFERENCES `shot` (`shot_id`),
   ADD CONSTRAINT `shotasset_ibfk_2` FOREIGN KEY (`asset_id`) REFERENCES `asset` (`asset_id`);
 
 --
--- Constraints der Tabelle `task`
+-- Constraints for table `task`
 --
 ALTER TABLE `task`
   ADD CONSTRAINT `task_ibfk_1` FOREIGN KEY (`status_id`) REFERENCES `status` (`status_id`),
@@ -662,35 +662,35 @@ ALTER TABLE `task`
   ADD CONSTRAINT `task_ibfk_3` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
--- Constraints der Tabelle `taskasset`
+-- Constraints for table `taskasset`
 --
 ALTER TABLE `taskasset`
   ADD CONSTRAINT `taskasset_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `task` (`task_id`),
   ADD CONSTRAINT `taskasset_ibfk_2` FOREIGN KEY (`asset_id`) REFERENCES `asset` (`asset_id`);
 
 --
--- Constraints der Tabelle `userproject`
+-- Constraints for table `userproject`
 --
 ALTER TABLE `userproject`
   ADD CONSTRAINT `userproject_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON UPDATE CASCADE,
   ADD CONSTRAINT `userproject_ibfk_2` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
--- Constraints der Tabelle `userscene`
+-- Constraints for table `userscene`
 --
 ALTER TABLE `userscene`
   ADD CONSTRAINT `userscene_ibfk_2` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON UPDATE CASCADE,
   ADD CONSTRAINT `userscene_ibfk_3` FOREIGN KEY (`scene_id`) REFERENCES `scene` (`scene_id`);
 
 --
--- Constraints der Tabelle `usershot`
+-- Constraints for table `usershot`
 --
 ALTER TABLE `usershot`
   ADD CONSTRAINT `usershot_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON UPDATE CASCADE,
   ADD CONSTRAINT `usershot_ibfk_2` FOREIGN KEY (`shot_id`) REFERENCES `shot` (`shot_id`);
 
 --
--- Constraints der Tabelle `userskill`
+-- Constraints for table `userskill`
 --
 ALTER TABLE `userskill`
   ADD CONSTRAINT `userskill_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`),
@@ -699,14 +699,14 @@ ALTER TABLE `userskill`
   ADD CONSTRAINT `userskill_ibfk_4` FOREIGN KEY (`skill_id`) REFERENCES `skill` (`skill_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `usertask`
+-- Constraints for table `usertask`
 --
 ALTER TABLE `usertask`
   ADD CONSTRAINT `usertask_ibfk_1` FOREIGN KEY (`username`) REFERENCES `user` (`username`) ON UPDATE CASCADE,
   ADD CONSTRAINT `usertask_ibfk_2` FOREIGN KEY (`task_id`) REFERENCES `task` (`task_id`);
 
 --
--- Constraints der Tabelle `workflowstructure`
+-- Constraints for table `workflowstructure`
 --
 ALTER TABLE `workflowstructure`
   ADD CONSTRAINT `workflowstructure_ibfk_1` FOREIGN KEY (`workflow_id`) REFERENCES `workflow` (`workflow_id`);
