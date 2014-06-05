@@ -1,17 +1,15 @@
-<div class="col_11 column">
-	<ul class="breadcrumbs">
-		<li class="first">
-			<a href="<?php echo base_url('mystuff/dashboard');?>">Home</a>
-		</li>
-		<li>
-			<a href>Tools</a>
-		</li>
-		<li class="last">
-			<a href>Calendar</a>
-		</li>
-	</ul>
+<div class="row">
+	<div class="col-md-7">
+		<ol class="breadcrumb">
+			<li><a href="<?=base_url('mystuff/dashboard')?>">Home</a></li>
+			<li><a>Tools</a></li>
+			<li class="active">Calendar</li>
+		</ol>
+	</div>
+	<div class="col-md-5"><span class="pagetitle pagetitle-mini">CALENDAR</span></div>
 </div>
-<div class="calendar_view">CALENDAR</div>
-<div class="col_12 column">
-	<?php echo $calendar; ?>
+<div class="row">
+	<div class="col-md-12">
+		<?=$calendar?>
+	</div>
 </div>

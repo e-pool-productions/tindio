@@ -34,9 +34,7 @@
             	$this->template->load('login/login_view', $data);
 			}
 			else
-			{
                 redirect('mystuff/dashboard');
-			}
 		}
         
 		/**
@@ -53,14 +51,12 @@
             $this->form_validation->set_rules('password', 'Password', 'required|trim|xss_clean|callback_check->database');
 			
             if ($this->form_validation->run() == FALSE)
-            {
-                $this->load->view('login/login_view');
-            }
+                $this->index();
             else
             {
-                $session = $this->session->userdata('logged_in');
                 $lastaccess = date("y-m-d H:i:s");
-                $this->db_model->update('user', array('username'=>$session['user']), array('lastaccess'=>$lastaccess));
+				$user = $this->session->userdata('user');
+                $this->db_model->update('user', "username = '$user'", array('lastaccess'=>$lastaccess));
 
                 redirect('mystuff/dashboard');
             }

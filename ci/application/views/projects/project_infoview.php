@@ -1,85 +1,143 @@
-<script src="<?=JS.'assets.js'?>"></script>
-
-<script type="text/javascript">
-    function confDelete() {
-        return confirm('Delete whole Scene?\n\n' +
-                       'There might be associated\n' +
-                       '\tShots\n' +
-                       '\tTasks\n' +
-                       'which will be deleted too!');
-    };
+<div class="row">
+	<div class="col-md-7">
+		<ol class="breadcrumb">
+			<li><a href="<?=base_url('mystuff/dashboard')?>">Home</a></li>
+			<li><a href="<?=base_url('projects')?>">All Projects</a></li>
+			<li class="active"><?=$project['title']?></li>
+		</ol>
+	</div>
+</div>
+<div class="row top-buffer-sm">
+    <div class="col-md-9">
+        <div class="row">
+        	<?php
+        		$editUrl = base_url('projects/edit/'.$project['project_id']);
+				$edit = $permissions['edit'] ? EDIT_ICON : '';
+				
+				if($permissions['edit'])
+				{
+					$onclicks = array(	'logo' => "onclick=\"edit(this, '$editUrl/logo')\"",
+										'title' => "onclick=\"edit(this, '$editUrl/title')\"",
+										'shortcode' => "onclick=\"edit(this, '$editUrl/shortcode')\"",
+										'category' => "onclick=\"edit(this, '$editUrl/category_id')\"",
+										'description' => "onclick=\"edit(this, '$editUrl/description')\"",
+										'deadline' => "onclick=\"edit(this, '$editUrl/deadline')\"");
+										
+				}
+				else
+					$onclicks = array('logo' => '', 'title' => '', 'shortcode' => '', 'category' => '', 'description' => '', 'deadline' => '');
+        	?>
+            <div class="col-md-4" <?=$onclicks['logo']?>>
+            	<img src="<?=$logo['path']?>" class="img-responsive">
+            </div>
+            <div class="col-md-4">
+                <legend>INFO <?=$edit?></legend>
+                <div class="well well-sm">
+                	<p class="wordwrap"><b><span <?=$onclicks['title']?>><?=$project['title']?></span></b></p>
+                    <p>CODE: <span <?=$onclicks['shortcode']?>><?=$project['shortcode']?></span></p>
+                    <p>CATEGORY: <span <?=$onclicks['category']?>><?=$category['title']?></span></p>
+                    <p>DIRECTOR: <?=$directors?></p>
+                    <p class="wordwrap">DESCRIPTION: <span <?=$onclicks['description']?>><?=$project['description']?></span></p>    
+                    <p>STATUS: <?=$status?></p>
+                    <p align="center"><?=$button?></p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <legend>DETAILS</legend>
+                <div class="well well-sm">
+                    <p>Deadline - <span <?=$onclicks['deadline']?>><?=$deadline?></span> <?=$edit?></p>
+                    <p>Startdate - <?=$startdate?></p>
+                    <p>End date - <?=$enddate?></p> 
+                    <p>Duration - <?=$duration?></p>
+                    <p>Scenes - <?=$scenecount?> [<?=$scenesfinished?> finished]</p>
+                    <p>Shots - <?=$shotcount?> [<?=$shotsfinished?> finished]</p>
+                    <p>Crew - <?=$crewtext?></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-heading clearfix">
+                        <b class="pull-left" style="padding-top: 5px;">SCENES</b>
+                        <div class="btn-group pull-right">
+                            <?php
+		                    	if($isAdmin || $isDirector)
+		                    		echo '<a href="'.base_url('/scenes/create/'.$project['project_id']).'" data-target="#modal" data-toggle="modal" class="btn btn-default btn-sm"><i class="fa fa-file-o"></i> Add new Scene</a>';
+		                    ?>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <?=$scenetable?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     
-    function confUnassign(firstname, lastname) {
-    	return confirm('Do you really want to unassign\n'+
-    	               '\t'+firstname+' '+lastname+'\n'+
-    	               'from project?');
-    };
-</script>
+    <div class="col-md-3">
+        <div class="panel panel-default">
+            <div class="panel-heading clearfix">
+                <b class="pull-left" style="padding-top: 5px;">PROJECT FILES</b>
+                <div class="btn-group pull-right">
+                    <?php
+                        if($isAdmin || $isDirector)
+                            echo 	'<a href="'.base_url('/all_assets/link_asset/project/'.$project['project_id']).'" class="btn btn-default btn-sm"><i class="fa fa-link"></i></a>
+                            		 <a href="'.base_url('/upload/choose_files/project_'.$project['project_id'].'/true').'" data-target="#modal" data-toggle="modal" class="btn btn-default btn-sm"><i class="fa fa-external-link-square"></i></a>
+                            		 <a href="'.base_url('/upload/choose_files/project_'.$project['project_id']).'" data-target="#modal" data-toggle="modal" class="btn btn-default btn-sm"><i class="fa fa-upload"></i></a>';
+                    ?>
+                </div>
+            </div>
+            <?=$projectfiles?>
+        </div>
+        <div class="panel panel-default top-buffer">
+            <div class="panel-heading clearfix">
+                <b class="pull-left" style="padding-top: 5px;">PROJECT MEMBERS</b>
+                <div class="btn-group pull-right">
+                    <?php
+                    	if($isAdmin || $isDirector)
+                    		echo '<a href="'.base_url('users/show/project/'.$project['project_id']).'"; class="btn btn-default btn-sm"><i class="fa fa-user"></i> Add Member</a>';
+                    ?>
+                </div>
+            </div>
+            <?=$usertable?>
+        </div>
+    </div>
+</div>
 
-<div class="col_11 column">
-	<ul class="breadcrumbs">
-		<li class="first"><a href="<?=base_url('mystuff/dashboard')?>">Home</a></li>
-		<li><a href="<?=base_url('projects')?>">All Projects</a></li>
-		<li class="last"><a href=""><?=$project['title']?></a></li>
-	</ul>
-</div>
-<div class="col_12 column">
-	<?php
-		if($permissions['edit'])
-		{?>
-   			 <a href="<?=base_url('projects/edit/' . $project['project_id'])?>" data-target="#modal" data-toggle="modal" class="tooltip"><i class="icon-edit"></i>Edit Project</a><br>
-		<?php } ?>
-	<div class="col_4 project_logo column">
-		<?=$logo?>
-	</div>
-	<div class="col_2 project_details column">
-			<legend>INFO</legend>
-			<fieldset>
-				<div style="white-space:pre-wrap; word-break: break-all; word-wrap: break-word;"><h6 class="project_movietitle"><?=$project['title']?></h6></div>
-				<p>CODE: <?=$project['shortcode']?></p>
-				<p>DIRECTOR: <?=$directors?></a></p>
-				<div style="white-space:pre-wrap; word-break: break-all; word-wrap: break-word;"><p>DESCRIPTION: <?=$project['description']?></p></div>	
-				<p>STATUS: <i id='actual_status_<?=$status['title']?>'><?=$status['status']?></i></p>
-				<p align="center"><?=$button?></p>
-			</fieldset>
-	</div>
-	<div class="col_2 project_details column">
-			<legend>DETAILS</legend>
-			<fieldset>
-				<p>Deadline  - <?=$deadline?></p>
-				<p>Startdate - <?=$startdate?></p>
-				<p>End date - <?=$enddate?></p>	
-				<p>Duration - <?=$duration?></p>
-				<p>Scenes - <?=$scenecount?> [<?=$scenesfinished?> finished]</p>
-				<p>Shots - <?=$shotcount?> [<?=$shotsfinished?> finished]</p>
-				<p>Crew - <?=$crewtext?></p>
-			</fieldset>
-	</div>
-	<div class="col_3 right column">
-		<h6 class="project_titleleft">PROJECT FILES</h6>
-		<?php
-			if(isset($addNewFile))
-			{
-				echo $linkNewFile;
-				echo $addNewFile;
-			}
-			echo $projectfiles;
-		?>
-	</div>
-	<div class="col_9 right column">
-		<h6 class="project_titleleft">SCENES</h6>
-		<?php
-			if(isset($addNewScene))
-				echo $addNewScene;
-			echo $scenetable;
-		?>
-	</div>
-	<div class="col_3 right column">
-		<h6 class="project_titleleft">PROJECT MEMBERS</h6>
-		<?php
-			if(isset($addObserver))
-				echo $addObserver;
-			echo $usertable;
-		?>
-	</div>
-</div>
+<script src="<?=JS.'edit.js'?>"></script>
+<script src="<?=JS.'confirm.js'?>"></script>
+<script type="text/javascript">    
+    $(window).load(function() {
+        var categories = <?=json_encode($categories);?>;
+        cateDrop = document.createElement('select');
+        
+        categories.forEach(function(category){
+            var opt = new Option();
+            opt.value = category['category_id'];
+            opt.text = category['title'];
+            cateDrop.options.add(opt);
+        });
+        
+        var maxOrderposition = <?=$maxOrderposition?>;
+        posDrop = document.createElement('select');
+        
+        for(var i = 1; i <= maxOrderposition; i++)
+        {
+        	var opt = new Option();
+        	opt.value = i;
+        	opt.text = i;
+        	posDrop.options.add(opt);
+        }
+        
+        var logos = <?=json_encode($logos);?>;
+        logoDrop = document.createElement('select');
+        
+        logos.forEach(function(logo){
+        	var opt = new Option();
+        	opt.value = logo['asset_id'];
+        	opt.text = logo['title'];
+        	logoDrop.options.add(opt);
+        });
+    });
+</script>

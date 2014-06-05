@@ -1,6 +1,3 @@
-<script type="text/javascript" src="<?php echo(JS.'upload.js'); ?>"></script>
-<script type="text/javascript" src="<?php echo(JS.'modalSubmit.js'); ?>"></script>
-
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
@@ -15,16 +12,14 @@
             if(isset($error)) echo $error;
         
             echo form_open_multipart('', array('id' => 'formfiles', 'name' => 'formfiles'));
-            echo form_input(array('type' => 'file', 'name' => 'userfile', 'id' => 'fileupload', 'multiple' => 'multiple', 'onchange' => 'handleFileSelect(false)'));
-            echo form_input(array('type' => 'button', 'value' => 'Add Link', 'onclick' => 'handleFileSelect(true)'));
+            echo form_input(array('type' => 'file', 'name' => 'userfile', 'id' => 'fileupload', 'multiple' => 'multiple', 'onchange' => 'handleFileSelect()'));
             echo form_close();
             
-            echo form_open('upload/insertFiles', array('id' => 'subForm', 'name' => 'subForm'));
+			$action = "upload/insertFiles/$section".(isset($section_id) ? "/$section_id" : '');
+            echo form_open($action, array('id' => 'subForm', 'name' => 'subForm'));
             ?>
             <output id="hidden">
                 <input type="hidden" id="amount" name="amount" value="0">
-                <input type="hidden" name="section" value="<?=$section?>">
-                <?php if(isset($id)) echo '<input type="hidden" name="id" value="' . $id . '">';?>
                 <?php if(isset($setting)) echo '<input type="hidden" name="setting" value="1">';?>
             </output>
             <?php
@@ -35,113 +30,110 @@
         <div class="modal-footer">
         <?php 
             echo form_button(array('content' => 'Close', 'class'=>'btn btn-default', 'data-dismiss' => 'modal'));
-            echo form_button(array('content' => 'Upload', 'id' => 'submit', 'class'=>'btn btn-primary', 'type' => 'submit', 'onclick' => 'validate(); return false;')) . br(1);
+            echo form_button(array('content' => 'Upload', 'id' => 'submit', 'class'=>'btn btn-primary', 'type' => 'submit', 'onclick' => 'validate(); return false;'));
         ?>
         </div>
     </div>
 </div>
-        
+<script type="text/javascript" src="<?php echo(JS.'upload.js'); ?>"></script>
+<script type="text/javascript" src="<?php echo(JS.'formSubmit.js'); ?>"></script>
 <script>
 	init('<?=base_url('upload/upload_file')?>', '<?=base_url('upload/merge_file')?>');
 	
-    function handleFileSelect(isLink) {
+    function handleFileSelect() {
         
         var rows = [];
         var hiddens = [];
         var amount = document.getElementById('amount').value;
         
-    	if(isLink)
-    	{
-    	    hiddens.push('<input type="hidden" id="isLink' + amount + '" name="isLink' + amount + '" value="true">');
-    	    rows.push.apply(rows, createRow(true));
-    	}
-    	else
-    	{
-        	for(var i = 0, file; file = document.getElementById('fileupload').files[i]; i++)
-                files.push(file);
-                    
-            for (var i = amount, f; f = files[i]; i++)
-            {
-                hiddens.push(   '<input type="hidden" id="isLink' + i + '" name="isLink' + i + '" value="false">',
-                                '<input type="hidden" id="name' + i + '" name="name' + i + '" value="' + f.name + '">');
-                rows.push.apply(rows, createRow(false));
-            }
-         }
+    	for(var i = 0, file; file = document.getElementById('fileupload').files[i]; i++)
+            files.push(file);
+                
+        for (var i = amount, f; f = files[i]; i++)
+        {
+            hiddens.push('<input type="hidden" id="name' + i + '" name="name' + i + '" value="' + f.name + '">');
+            rows.push.apply(rows, createRow(false));
+        }
          
          document.getElementById('hidden').innerHTML += hiddens.join('');
          createTable(rows);
     }
     
-    function createRow(isLink) {
+    function createRow() {
         
         var row = new Array();
         var eleAmount = document.getElementById('amount');
         var next = eleAmount.value;
 
-        row.push('<tbody><tr class="top">',
+        row.push('<tbody><tr>',
                     '<th class="title">Title/Type</th>',
-                    '<td colspan="2" class="up">',
+                    '<td colspan="3">',
                         '<div class="progress_bar" id="progress_bar' + next + '" name="progress_bar' + next + '">',
                             '<div class="percent" id="percent' + next + '" name="percent' + next + '"></div>',
                         '</div>',
-                        // '<button id="remove'+ next +'" onclick="removeRow(this, ' + isLink + '); return false;" class="remove tooltip"><i class="icon-remove"></i></button>',
-                        '<a id="remove'+ next +'" onclick="removeRow(this, ' + isLink + '); return false;" href="" class="remove tooltip"><i class="icon-remove"></i></a>',
+                        '<a id="remove'+ next +'" onclick="removeRow(this); return false;" href=""><i class="fa fa-times"></i></a>',
                     '</td>',
                  '</tr>',
                  '<tr>');
 
-        if(isLink)
-        {
-            row.push(
-                    '<td rowspan="2" class="up left">',
-                        '<input id="title'+ next +'" name="title'+ next +'" placeholder="Name your Asset">',
-                        '<input id="link'+ next +'" name="link'+ next +'" placeholder="http://example.com/tree.obj">',
-                    '</td>');
-        }
-        else
-        {
-            var predType = files[next].type || 'n/a';
+        var predType = files[next].type || 'n/a';
+        
+        if(predType != 'n/a')
+            predType = predType.substring(0, predType.indexOf('/'));
+        
+        var types = <?=json_encode($types);?>;
             
-            if(predType != 'n/a')
-                predType = predType.substring(0, predType.indexOf('/'));
-            
-            var types = <?=json_encode($types);?>;
+        var opt;
+        types.forEach(function(type){
+            if(type['assettype_id'] != 4)
+            {
+                var selected =  predType == type['type_name'].toLowerCase() ||
+                                predType != 'video' && predType != 'audio' && predType != 'image';
                 
-            var opt;
-            types.forEach(function(type){
-                if(type['assettype_id'] != 4)
-                {
-                    var selected =  predType == type['type_name'].toLowerCase() ||
-                                    predType != 'video' && predType != 'audio' && predType != 'image';
-                    
-                    opt += '<option value="' + type['assettype_id'] + '"' + (selected ? 'selected' : '') + '>' + type['type_name'] + '</option>';
-                }          
-            });
-            
-            row.push(
-                    '<td rowspan="3" class="up left">',
-                        '<input id="title'+ next +'" name="title'+ next +'" placeholder="Name your Asset">',
-                        '<select id="type'+ next +'" name="type'+ next +'">' + opt + '</select>',
-                    '</td>',
-                    '<th scope="row">Details</th>',
-                    '<td class="up info">',
-                        '<strong>' + files[next].name + '</strong><br />',
-                        ' (', files[next].type || 'n/a', ') - ', files[next].size, ' bytes',
-                    '</td>',
-                 '</tr>',
-                 '<tr>');
-        }
-                                    
-        row.push(   '<th scope="row">Description</th>',
-                    '<td class="ta"><textarea id="description'+ next +'" name="description'+ next +'"></textarea></td>',
-                 '</tr>',
-                 '<tr>',
-                    '<th scope="row">Tags</th>',
-                    '<td class="ta"><textarea id="tags'+ next +'" name="tags' + next + '"></textarea></td>',
-                 '</tr>',
-                 '<tr>',
-                    '<td colspan="3" class="blank"></td>',
-                 '</tr></tbody>');
+                opt += '<option value="' + type['assettype_id'] + '"' + (selected ? 'selected' : '') + '>' + type['type_name'] + '</option>';
+            }          
+        });
+        
+        row.push(
+        	'<td rowspan="3">',
+					'<input id="title'+ next +'" name="title'+ next +'" placeholder="Name your Asset">',
+                    '<select id="type'+ next +'" name="type'+ next +'">' + opt + '</select>',
+                '</td>',
+                '<th scope="col">Description</th>',
+                '<th scope="col">Tags</th>',
+                '<th scope="col">Details</th>',
+			'</tr>',
+			'<tr>',
+                '<td class="wordwrap"><textarea id="description'+ next +'" name="description'+ next +'" style="width: 100%; height: 100%; border: none"></textarea></td>',
+                '<td class="wordwrap"><textarea id="tags'+ next +'" name="tags' + next + '" style="width: 100%; height: 100%; border: none"></textarea></td>',
+                '<td class="info">',
+                    '<strong>' + files[next].name + '</strong><br />',
+                    ' (', files[next].type || 'n/a', ') - ', files[next].size, ' bytes',
+                '</td>',
+			'</tr>',
+		'</tbody>');
+        		// '<td rowspan="3">',
+					// '<input id="title'+ next +'" name="title'+ next +'" placeholder="Name your Asset">',
+                    // '<select id="type'+ next +'" name="type'+ next +'">' + opt + '</select>',
+                // '</td>',
+                // '<th scope="row">Details</th>',
+                // '<td class="up info">',
+                    // '<strong>' + files[next].name + '</strong><br />',
+                    // ' (', files[next].type || 'n/a', ') - ', files[next].size, ' bytes',
+                // '</td>',
+			// '</tr>',
+			// '<tr>',
+				// '<th scope="row">Description</th>',
+                // '<td class="ta"><textarea id="description'+ next +'" name="description'+ next +'"></textarea></td>',
+			// '</tr>',
+			// '<tr>',
+				// '<th scope="row">Tags</th>',
+				// '<td class="ta"><textarea id="tags'+ next +'" name="tags' + next + '"></textarea></td>',
+			// '</tr>',
+			// '<tr>',
+				// '<td colspan="3" class="blank"></td>',
+			// '</tr>',
+		// '</tbody>');
 
         eleAmount.value++;
         return row;
@@ -154,6 +146,7 @@
         {
             table = document.createElement('table');
             table.setAttribute('id', 'uploadTable');
+            table.setAttribute('class', 'table table-bordered')
             table.innerHTML = rows.join('');
             document.subForm.appendChild(table);
         }
@@ -161,7 +154,7 @@
             table.innerHTML += rows.join('');
     }
     
-	function removeRow(el, isLink) {
+	function removeRow(el) {
         
         var str = el.getAttribute('id');
         var index = parseInt(str.substring(str.length - 1, str.length));
@@ -169,20 +162,14 @@
 		var body = document.getElementById("uploadTable").getElementsByTagName('tbody')[index];
 		body.parentNode.removeChild(body);
 		
-		if(!isLink)
-		{
-		  files.splice(index, 1);
-		  
-		  var hidden = document.getElementById('name' + index);
-          hidden.parentNode.removeChild(hidden);
-		}
-		
-	    var hidden = document.getElementById('isLink' + index);
-        hidden.parentNode.removeChild(hidden);
+		files.splice(index, 1);
+  
+		var hidden = document.getElementById('name' + index);
+		hidden.parentNode.removeChild(hidden);
 		
 		var amount = document.getElementById('amount');
 		
-		var objects = ['title', 'description', 'tags', 'progress_bar', 'percent', 'link', 'name', 'isLink', 'type', 'remove'];
+		var objects = ['title', 'description', 'tags', 'progress_bar', 'percent', 'name', 'type', 'remove'];
 
 		for(var rest = index; rest < amount.value; rest++)
 		{

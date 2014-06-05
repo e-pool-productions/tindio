@@ -3,61 +3,6 @@
      * model for the calendar and myWork
      */
     class Mystuff_model extends CI_Model {
-        
-        /**
-         * calendar configuration
-         */
-        var $conf;
-        
-        /**
-         * Constructor
-         * sets the configuration variable
-         */
-        function __construct()
-        {
-            parent :: __construct();
-            
-            $this -> conf = array(
-                'show_next_prev' => true,
-                'next_prev_url' => base_url('mystuff/calendar'),
-                'day_type' => 'long',
-                'template' =>   '{table_open}<table border="0" cellpadding="0" cellspacing="0" class="calendar">{/table_open}
-                
-                                {heading_row_start}<tr>{/heading_row_start}
-                                
-                                {heading_previous_cell}<th><a href="{previous_url}">&lt;&lt;</a></th>{/heading_previous_cell}
-                                {heading_title_cell}<th colspan="{colspan}">{heading}</th>{/heading_title_cell}
-                                {heading_next_cell}<th><a href="{next_url}">&gt;&gt;</a></th>{/heading_next_cell}
-                                
-                                {heading_row_end}</tr>{/heading_row_end}
-                                
-                                {week_row_start}<tr>{/week_row_start}
-                                {week_day_cell}<td>{week_day}</td>{/week_day_cell}
-                                {week_row_end}</tr>{/week_row_end}
-                            
-                                {cal_row_start}<tr class="days">{/cal_row_start}
-                                {cal_cell_start}<td>{/cal_cell_start}
-                                
-                                {cal_cell_content}
-                                    <div class="day_num">{day}</div>
-                                    <div class="content" style="overflow-x:auto; max-width: 174px; margin-right:-100px">{content}</div>
-                                {/cal_cell_content}
-                                {cal_cell_content_today}
-                                    <div class="day_num highlight">{day}</div>
-                                    <div class="content" style="overflow-x:auto; max-width: 174px; margin-right:-100px">{content}</div>
-                                {/cal_cell_content_today}
-                                
-                                {cal_cell_no_content}<div class="day_num">{day}</div>{/cal_cell_no_content}
-                                {cal_cell_no_content_today}<div class="day_num highlight">{day}</div>{/cal_cell_no_content_today}
-                                
-                                {cal_cell_blank}&nbsp;{/cal_cell_blank}
-                                
-                                {cal_cell_end}</td>{/cal_cell_end}
-                                {cal_row_end}</tr>{/cal_row_end}
-                                
-                                {table_close}</table>{/table_close}');
-    
-        }   
 
         /**
          * generates the calendar using the configuration, the given year and month
@@ -67,8 +12,48 @@
          * @return the calendar
          */
         function generate($year, $month){
-            
-            $this->load->library('calendar', $this->conf);
+        	
+			$conf = array(  'show_next_prev' => true,
+			                'next_prev_url' => base_url('mystuff/calendar'),
+			                'day_type' => 'long',
+			                'start_day' => 'monday',
+			                'template' =>   '{table_open}<div class="panel panel-default">{/table_open}
+							
+			                				{heading_row_start}<div class="panel-heading clearfix text-center">{/heading_row_start}
+			                				 
+			                				{heading_previous_cell}<a href="{previous_url}" class="btn btn-default pull-left">&lt;&lt;</a>{/heading_previous_cell}
+			                				{heading_title_cell}<span style="font-size:1.7em;">{heading}</span>{/heading_title_cell}
+											{heading_next_cell}<a href="{next_url}" class="btn btn-default pull-right">&gt;&gt;</a>{/heading_next_cell}
+			                				
+			                				{heading_row_end}</div>{/heading_row_end}
+			                					
+			                				{week_row_start}<table class="table table-bordered calendar text-center"><tr>{/week_row_start}
+											{week_day_cell}<td>{week_day}</td>{/week_day_cell}
+											{week_row_end}</tr>{/week_row_end}
+
+			                                {cal_row_start}<tr class="days">{/cal_row_start}
+			                                {cal_cell_start}<td>{/cal_cell_start}
+			                                
+			                                {cal_cell_content}
+			                                    <div class="day_num">{day}</div>
+			                                    <div class="content" style="overflow-x:auto; max-width: 174px; margin-right:-100px">{content}</div>
+			                                {/cal_cell_content}
+			                                {cal_cell_content_today}
+			                                    <div class="day_num highlight">{day}</div>
+			                                    <div class="content" style="overflow-x:auto; max-width: 174px; margin-right:-100px">{content}</div>
+			                                {/cal_cell_content_today}
+			                                
+			                                {cal_cell_no_content}<div class="day_num">{day}</div>{/cal_cell_no_content}
+			                                {cal_cell_no_content_today}<div class="day_num highlight">{day}</div>{/cal_cell_no_content_today}
+			                                
+			                                {cal_cell_blank}&nbsp;{/cal_cell_blank}
+			                                
+			                                {cal_cell_end}</td>{/cal_cell_end}
+			                                {cal_row_end}</tr>{/cal_row_end}
+			                                
+			                                {table_close}</table></div>{/table_close}'
+											);
+            $this->load->library('calendar', $conf);
             
             $session = $this->session->userdata('logged_in');
             $sections = array('task', 'shot', 'scene');
@@ -102,11 +87,18 @@
          * @param $user String username of the user to get work for
          * @return mixed work_items
          */
-        public function getWork($user)
-        {           
-            return array_merge( $this->gather_work_info('task', $this->db_model->get('usertask ut, task t', "username = '$user' AND ut.task_id = t.task_id")),
-                                $this->gather_work_info('shot', $this->db_model->get('usershot ush, shot sh', "username = '$user' AND ush.shot_id = sh.shot_id")),
-                                $this->gather_work_info('scene', $this->db_model->get('userscene usc, scene sc', "username = '$user' AND usc.scene_id = sc.scene_id")));
+        function getWork($user, $sections = array('task', 'shot', 'scene'), $where = true)
+        {
+        	if(is_null($sections))
+				$sections = array('task', 'shot', 'scene');
+				
+        	foreach($sections as $section)
+				$sec_work[] = $this->gather_work_info($section, $this->db_model->get("user$section us, $section s", "username = '$user' AND us.".$section."_id = s.".$section."_id AND $where"));
+			
+			while (count($sec_work) < 3)
+				$sec_work[] = array();			
+			
+			return array_merge($sec_work[0], $sec_work[1], $sec_work[2]);
         }
 
 		/**
@@ -155,9 +147,9 @@
             {
                 if($asset['type_name'] != 'Link')
                     $erg .= '<a href="' . base_url('all_assets/showcase/' . urlencode(strtolower($asset['type_name'])) . '/' . $asset['path']) . 
-                            '" data-target="#modal" data-toggle="modal" class="tooltip">'.$asset['title'].' </a>, ';
+                            '" data-target="#modal" data-toggle="modal">'.$asset['title'].'</a>, ';
                 else 
-                    $erg .= '<a href="http://' . $asset['path'] . '" target="_blank" class="tooltip">'.$asset['title'].'</a>, ';
+                    $erg .= '<a href="http://' . $asset['path'] . '" target="_blank">'.$asset['title'].'</a>, ';
             }
 
             return $erg;

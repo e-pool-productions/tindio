@@ -140,12 +140,10 @@
             $where = '';
             if(strpos(strtolower($filter),'my:') !== false)
             {
-                $session = $this->session->userdata('logged_in');
                 if(count($filter_terms) == 1)
-                    return $this->get_assets('general', null, 'author = \''.$session['user'].'\'');
+                    return $this->get_assets('general', null, 'author = \''.$this->session->userdata('user').'\'');
                 
-                $session = $this->session->userdata('logged_in');
-                $where = ' AND author = \''.$session['user'].'\'';
+                $where = ' AND author = \''.$this->session->userdata('user').'\'';
             }
 
             switch($field)

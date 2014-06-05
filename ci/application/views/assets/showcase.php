@@ -1,15 +1,3 @@
-<script>
-	function setStyle() {
-		var obj = document.getElementById("obj");
-		var doc = obj.contentDocument;
-		
-		obj.style.maxWidth = obj.style.maxHeight = '100%';
-		
-		if(!doc)
-			obj.style.height = obj.style.width = 'auto';
-	}
-</script>
-
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <div class="modal-header">
@@ -27,10 +15,8 @@
 			        <script type="text/javascript" src="<?=JS.'jsc3d.js'?>"></script>
 			        <script type="text/javascript">
 			            var viewer = new JSC3D.Viewer(document.getElementById('cv'));
-			            // viewer.setParameter('SceneUrl', '<?=$path?>');
 			            viewer.setParameter('SceneUrl', '<?=MEDIA . $path?>');
 			            viewer.setParameter('ModelColor',       '#CAA618');
-			            // viewer.setParameter('BackgroundColor1', '#E5D7BA');
 			            viewer.setParameter('Definition', 'high');
 			            viewer.setParameter('RenderMode',       'texturesmooth');
 			            viewer.setParameter('Renderer', 'webgl');
@@ -56,3 +42,14 @@
         </div>
     </div>
 </div>
+<script>
+	function setStyle() {
+		var obj = document.getElementById("obj");
+		var doc = obj.contentDocument;
+		
+		obj.style.maxWidth = obj.style.maxHeight = '100%';
+		
+		if(!doc)
+			obj.style.height = obj.style.width = 'auto';
+	}
+</script>

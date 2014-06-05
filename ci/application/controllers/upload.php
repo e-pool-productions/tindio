@@ -10,9 +10,9 @@
         public function __construct()
         {
             parent::__construct();
-            $this->load->library('table');
             $this->load->model('assets');
-            $this->load->helper(array('form', 'file'));
+			$this->load->helper(array('form', 'file'));
+			$this->load->library(array('form_validation', 'table'));
         }
 
         /**
@@ -22,19 +22,23 @@
 		 * 
          * @version 1.0
         */
-        function choose_files($section)
+        function choose_files($section, $isLink = false)
         {
         	$str = explode('_', $section);
 			
 			$data['section'] = $str[0];
-			if(count($str) > 1)
-				$data['id'] = $str[1];	
+			$data['section_id'] = count($str) > 1 ? $str[1] : '';
+
 			if(count($str) > 2)
 				$data['setting'] = $str[2];
 			
-            $data['types'] = $this->db_model->get('assettype');
-
-            $this->load->view('assets/upload_view', $data);
+			if($isLink)
+				$this->load->view('assets/newlink_view', $data);
+			else
+			{
+				$data['types'] = $this->db_model->get('assettype');
+            	$this->load->view('assets/upload_view', $data);	
+			}
         }
 		
 		/**
@@ -87,56 +91,43 @@
 		/**
 		 * inserts and uploads files
 		 */
-        function insertFiles()
+        function insertFiles($section, $section_id = null)
         {
-   	        $section = $this->input->post('section');
             $fileAmount = $this->input->post('amount');
-            $session = $this->session->userdata('logged_in');
             $type_names = $this->assets->get_type_names();
 
             for($i = 0; $i < $fileAmount; $i++)
             {
-                $isLink = $this->input->post('isLink'.$i) === 'true';
+                $fileNames[] = strtolower($this->input->post('name'.$i));
+                
+                $path = "media/" . strtolower($type_names[$this->input->post('type'.$i)]) . '/';
+                
+                if(file_exists($path.$fileNames[$i]))
+                {
+                    $ext = get_extension($path.$fileNames[$i]);
+                    $filename = str_replace($ext, '', $fileNames[$i]);
 
-                if($isLink)
-                {
-                    $link = $this->input->post('link'.$i);
-                    $fileNames[] =  strncmp($link, 'http://', 7) ? $link : substr($link, 7);
-                    $success[] = true;
-                }
-                else
-                {
-                    $fileNames[] = strtolower($this->input->post('name'.$i));
-                    
-                    $path = "media/" . strtolower($type_names[$this->input->post('type'.$i)]) . '/';
-                    
-                    if(file_exists($path.$fileNames[$i]))
+                    $new_filename = '';
+                    for ($j = 1; $j < 100; $j++)
                     {
-                        $ext = get_extension($path.$fileNames[$i]);
-                        $filename = str_replace($ext, '', $fileNames[$i]);
-
-                        $new_filename = '';
-                        for ($j = 1; $j < 100; $j++)
+                        if ( ! file_exists($path.$filename.$j.$ext))
                         {
-                            if ( ! file_exists($path.$filename.$j.$ext))
-                            {
-                                $new_filename = $filename.$j.$ext;
-                                break;
-                            }
+                            $new_filename = $filename.$j.$ext;
+                            break;
                         }
                     }
-                    else
-                        $new_filename = $fileNames[$i];
-                    
-                    $success[] = rename("media/processing/" . $fileNames[$i], $path . $new_filename);
                 }
+                else
+                    $new_filename = $fileNames[$i];
+                
+                $success[] = rename("media/processing/" . $fileNames[$i], $path . $new_filename);
                 
                 if($success[$i])
                     $files[] = array(   'title' => $this->input->post('title'.$i),
-                                        'author' => $session['user'],
-                                        'type_id' => $isLink ? '4' : $this->input->post('type'.$i),
+                                        'author' => $this->session->userdata('user'),
+                                        'type_id' => $this->input->post('type'.$i),
                                         'description' => $this->input->post('description'.$i),
-                                        'path' => ($isLink ? $fileNames[$i] : $new_filename),
+                                        'path' => $new_filename,
                                         'tags' => $this->input->post('tags'.$i),
                                         'global' => ($section == 'general'));
             }
@@ -148,9 +139,8 @@
             if(isset($files))
             {
                 $this->db_model->insert('asset', $files, true);
-                if($section != 'general')
+                if($section != 'general' && !is_null($section_id))
                 {
-                    $section_id = $this->input->post('id');
                     $asset_id = $this->db_model->get_single('asset', null, 'MAX(asset_id) as value');
 					
 					for($i = 0; $i < count($files); $i++)
@@ -168,5 +158,43 @@
             
             $this->load->view('assets/upload_successfull', $data);
         }
+
+		function addLink($section, $section_id = null)
+		{
+			$this->form_validation->set_rules('title', 'Title', 'required|trim|xss_clean');
+			$this->form_validation->set_rules('url', 'Url', 'required|trim|xss_clean');
+			
+			if ($this->form_validation->run() == FALSE)
+                $this->choose_files($section, true);
+            else
+            {
+				$url = $this->input->post('url');
+	            $fileName =  strncmp($url, 'http://', 7) ? $url : substr($url, 7);
+				
+				$file = array(	'title' => $this->input->post('title'),
+								'author' => $this->session->userdata('user'),
+								'type_id' => LINK,
+								'description' => $this->input->post('description'),
+								'path' => $fileName,
+								'tags' => $this->input->post('tags'),
+								'global' => ($section == 'general'));
+								
+				$this->db_model->insert('asset', $file);
+				
+	            if($section != 'general' && !is_null($section_id))
+	            {
+	                $asset_id = $this->db_model->get_single('asset', null, 'MAX(asset_id) as value');
+					
+	                $insert = array($section . '_id' => $section_id, 'asset_id' => $asset_id['value']);
+					
+	                if($section == 'task')
+	                    $insert['local'] = $this->input->post('setting');
+									   
+	                $this->db_model->insert($section . 'asset', $insert, true);
+	            }
+				
+				echo 'done';
+			}
+		} 
     }
 ?>

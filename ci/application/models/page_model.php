@@ -57,7 +57,7 @@
 		 */
 		public function get_deadlines($user)
 		{
-		$this->load->model('section_model');;
+			$this->load->model('section_model');
 			
 			$tasks = $this->db_model->get('task t, usertask ut', "ut.username = '$user' AND ut.task_id = t.task_id AND NOT t.status_id = ".STATUS_FINISHED);
 			$now = new DateTime("now");
@@ -87,7 +87,7 @@
 		public function get_globalstats()
 		{
 		    $lfp = $this->db_model->get_single('project', 'enddate IS NOT null ORDER BY enddate DESC', 'title, project_id');
-            $mrp = $this->db_model->get_single('project', 'startdate IS NOT null ORDER BY startdate', 'title, project_id');
+            $mrp = $this->db_model->get_single('project', 'creationtime IS NOT null ORDER BY creationtime DESC', 'title, project_id');
 
 			return array('totalprojects' => count($this->db_model->get('project', null, 'title')),
 			             'totalscenes'   => count($this->db_model->get('scene', null, 'title')),
@@ -98,7 +98,6 @@
 						 'lastfinishedproject_link' => base_url('projects/view/'.$lfp['project_id']),
 						 'mostrecentproject'=> $mrp['title'],
 						 'mostrecentproject_link' => base_url('projects/view/'.$mrp['project_id']));
-						 return array('totalprojects'=> $totalprojects);
 		}
 
 		/**
@@ -191,33 +190,6 @@
 		}
 
 		/**
-		 * creates a table tamplate with classname $classname
-		 * 
-		 * @param String $classname class attribute of the table
-		 * @param $width width if the table (in percent), default 100.
-		 */
-		public function get_table_template($classname, $width = 100)
-		{
-            return array(   'table_open'          => '<table class="'.$classname.'" style="width: '.$width.'%;">',
-                            'heading_row_start'   => '<tr class="form" style="font-size: 0.750em;">',
-                            'heading_row_end'     => '</tr>',
-                            'heading_cell_start'  => '<th class="cell" style="text-align: left;">',
-                            'heading_cell_end'    => '</th>',
-	                                
-                            'row_start'           => '<tr class="form" style="font-size: 0.750em;">',
-                            'row_end'             => '</tr>',
-                            'cell_start'          => '<td class="cell" style="text-align: left;">',
-                            'cell_end'            => '</td>',
-	                                
-                            'row_alt_start'       => '<tr class="form" style="font-size: 0.750em">',
-                            'row_alt_end'         => '</tr>',
-                            'cell_alt_start'      => '<td class="cell" style="text-align: left;">',
-                            'cell_alt_end'        => '</td>',
-	                                
-                            'table_close'         => '</table>');
-		}
-
-		/**
 		 * creates a table for output files
 		 * 
 		 * @param String $section 'Level' of the outputfile table - project, scene, shot, task
@@ -225,51 +197,130 @@
 		 * @param String $status ....
 		 * @param mixed $files the files to display
 		 */
-		public function createOutputFileTable($section, $id, $status, $files)
+		function createOutputFileTable($section, $section_id, $status, $files)
 		{
 			$this->load->library('table');
 			$this->load->model('assets');
 			$this->load->helper('form');
 			
+			$this->table->set_template(array('table_open' => '<table class="table table-bordered">'));
 			
-			$this->table->set_template($this->page_model->get_table_template($section.'_files'));
+			$canEdit = $this->permission->hasPermission('edit', $section, $section_id);
+			$edit = $canEdit ? EDIT_ICON : '';
 			
             if($section == 'project')
             {
-                $this->table->set_heading(array(array('data' => 'File <i class="icon-pencil" title="edit"></i>'),
+                $this->table->set_heading(array(array('data' => 'File '.$edit),
                                                 array('data' => 'Actions')));
             }
             else
             {
-                $this->table->set_heading(array(array('data' => 'File <i class="icon-pencil" title="edit"></i>'),
-                                                array('data' => $status),
+                $this->table->set_heading(array(array('data' => 'File '.$edit),
+                                                array('data' => $status.($status == 'Description' ? ' '.$edit : '')),
                                                 array('data' => 'Actions')));
             }
-			
+
 			$rows = null;
-            $rows2 = null;
 			foreach($files as $file)
 			{
+				$editUrl = base_url('all_assets/edit/specific/'.$file['asset_id']);
+				
 			    $showcase = array(	'data' => ($file['type_name'] == 'Link' ?
 												'<a href="http://' . $file['path'] . '" target="_blank" onmouseover="link=false;" onmouseout="link=true;">'.$file['title'].'</a>' :
 												'<a href="' . base_url('all_assets/showcase/' . strtolower($file['type_name']) . '/' . $file['path']) . '" onmouseover="link=false;" onmouseout="link=true;" data-target="#modal" data-toggle="modal">'.$file['title'].'</a>'),
-								 	'onclick' => 'if(link) editSectionAsset(this, ' . $file['asset_id'] . ', "'.base_url('all_assets/edit/title/'.$section.'_'.$id).'")');
+								 	'onclick' => 'if(link) edit(this, "'.$editUrl.'/title")');
                 
-                $stat = $status == 'Description' ?
-                			array('data' => $file['description'], 'onclick' => 'edit("description", this, ' . $file['asset_id'] . ', "'.base_url('all_assets/edit/description/'.$section.'_'.$id).'")') :
-                			($section == 'project' ? '' :
-                				array('data' => form_dropdown('appstatus', array('For Approval', 'Approved'), $file['approved'], 'id="'.$file['asset_id'].'" onchange="setApproval(this, \''.base_url($section.'s/approveFile/'.$id).'\')"')));
+				if($section != 'project')
+	                $stat = $status == 'Description' ?
+	                			array('data' => '<div style="overflow-x:auto">'.$file['description'].'</div>', 'onclick' => 'edit(this, "'.$editUrl.'/description")') :
+	               				array('data' => form_dropdown('appstatus', array('For Approval', 'Approved'), $file['approved'], 'id="'.$file['asset_id'].'" onchange="setApproval(this, \''.base_url($section.'s/approveFile/'.$section_id).'\')"'));
                 
-                $actions = array('data' => '<a href="' . base_url('all_assets/change_global/'.$section.'_'.$id.'/' . $file['asset_id'] .'/'. (int)!$file['global']) .'" class="tooltip" style="'. ($file['global'] ? 'color: #4D99E0;' : 'color: gray;') .'"><i class="icon-globe" title="change visibility"></i></a> '.
-                            				($file['type_name'] == 'Link' ? '' : '<a href="' . MEDIA . strtolower($file['type_name']) . '/' . $file['path'] . '" class="tooltip" download><i class="icon-download-alt" title="download"></i></a> ').
-				                            ($this->assets->is_Linked($file['asset_id']) ? 
-				                                '<a href="' . base_url('all_assets/unlink_asset/'.$section.'_'.$id.'/' . $file['asset_id']) . '" onclick="return confUnlinkAsset();" class="tooltip"><i class="icon-unlink" title="unlink"></i></a>' :
-												'<a href="' . base_url('all_assets/destroy/'.$section.'_'.$id.'/'.$file['asset_id']).'" onclick="return confDestroyAsset();" class="tooltip"><i class="icon-remove" title="delete"></i></a>'), 'style'=>'text-aling:center');
-			    
+				$suburl = $this->assets->is_Linked($file['asset_id']) ? 'unlink_asset/'.$section.'/'.$section_id : 'destroy/'.$section.'_'.$section_id;
+				$url = base_url('all_assets/'.$suburl.'/' . $file['asset_id']);
+				
+				$inhalt = '';
+				
+				if($status != 'Description' && $canEdit)
+					$inhalt .= '<a href="' . base_url('all_assets/change_global/'.$section.'/'.$section_id.'/' . $file['asset_id'] .'/'. (int)!$file['global']) .'" data-toggle="tooltip" title="change visibility" style="'. ($file['global'] ? 'color: #4D99E0;' : 'color: gray;') .'"><i class="fa fa-globe"></i></a> ';
+				
+				if($file['type_name'] != 'Link')
+					$inhalt .= '<a href="' . MEDIA . strtolower($file['type_name']) . '/' . $file['path'] . '" data-toggle="tooltip" title="download" download><i class="fa fa-download"></i></a> ';
+    
+				if($canEdit)
+					$inhalt .= $this->assets->is_Linked($file['asset_id']) ? 
+									'<a href="' . $url . '" onclick="return confUnlinkAsset();" data-toggle="tooltip" title="unlink"><i class="fa fa-chain-broken"></i></a>' :
+									'<a href="' . $url . '" onclick="return confDestroyAsset();" data-toggle="tooltip" title="delete"><i class="fa fa-times"></i></a>';
+				
+                $actions = array('data' => $inhalt);
+
                 $rows[] = $section == 'project' ? array($showcase, $actions) : array($showcase, $stat, $actions);
 			}
 
-			return $this->table->generate($rows);
+			return is_null($rows) ? '' : $this->table->generate($rows);
+		}
+
+		function createUserTable($section, $section_id)
+		{
+            $this->table->set_template(array('table_open' => '<table class="table table-bordered">'));
+
+			$canUnassign = $this->permission->haspermission('unassign', $section, $section_id);
+			
+			$heading = array(	array('data' => 'Name'),
+								array('data' => 'Role'),
+								array('data' => 'Last access'));
+								
+			if($canUnassign)
+				$heading[] = array('data' => '');
+             
+            $this->table->set_heading($heading);
+            
+            $users = $this->section_model->get_users($section, $section_id);
+			
+			$row = null;
+            foreach($users as $user)
+            {
+                $username = $user['username'];
+				$unassign = $canUnassign ?
+							'<a onclick="return confUnassign(\''.$section.'\', \''.$user['firstname'].'\', \''.$user['lastname'].'\');" href="'.base_url('users/unassign/'.$username.'/project/'.$section_id).'"><i class="fa fa-minus-circle"></i></a>' :
+							'';
+
+                $row = array(	array('data' => '<div style=\'overflow-x:auto\'><a href="'.base_url('users/profile/'.$username).'">'.$user['firstname'].' '.$user['lastname'].'</a></div>', 'class' => 'wordwrap'),
+								array('data' => $user['role_title']),
+                                array('data' => $user['lastaccess'])
+                            );
+							
+				if($canUnassign)
+					$row[] = array('data' => $unassign, 'style'=>'text-align:center');
+				
+				$this->table->add_row($row);
+            }
+			
+			return is_null($row) ? '' : $this->table->generate();
+		}
+
+		function createButton($section, $section_id, $status, $allFinished)
+		{
+			if($status == STATUS_IN_PROGRESS && $allFinished && $this->permission->hasPermission('setForApproval', $section, $section_id))
+				$conf = array('setForApproval', 'fa-circle-o', 'Set for Approval');
+			
+			elseif(in_array($status, array(STATUS_FOR_APPROVAL, STATUS_FINISHED, STATUS_PRE_PRODUCTION)) && $this->permission->hasPermission('setInProgress', $section, $section_id))
+			{
+				$conf = array('setInProgress', 'fa-spinner', 'Set to In Progress');
+				
+				if($section == 'task')
+					$conf[1] = 'fa-caret-square-o-right';				
+				
+				if($status == STATUS_FOR_APPROVAL && $this->permission->hasPermission('finish', $section, $section_id) && $allFinished)
+					array_push($conf, 'finish', 'fa-check-circle-o', 'Finish Scene');
+			}
+			
+			elseif($section == 'task' && $status == STATUS_UNASSIGNED && $this->permission->hasPermission('recruit', 'task', $section_id))
+				return '<a href="'.base_url('users/show/task/'.$section_id) .'" class="btn btn-default btn-sm"><i class="fa fa-user"></i> Recruit new User</a>';
+
+			return !isset($conf) ? '' :
+						'<a href="'.base_url($section.'s/'.$conf[0].'/'.$section_id) .'" class="btn btn-default btn-sm"><i class="fa '.$conf[1].'"></i> '.$conf[2].'</a>'.
+						(count($conf) == 6 ?	'<a href="'.base_url($section.'s/'.$conf[3].'/'.$section_id).'" class="btn btn-default btn-sm"><i class="fa  '.$conf[4].'"></i> '.$conf[5].'</a>' :
+											'');
 		}
     }
 ?>

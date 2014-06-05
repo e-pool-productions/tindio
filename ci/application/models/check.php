@@ -28,7 +28,7 @@
                 // Check if User is Admin
                 $isAdmin = ($this -> db_model -> get_single('admin', array('username'=>$user), 'username') !== false);
                 $sess_array = array('user' => $user, 'gravatar_url' => $gravatarUrl, 'isAdmin' => $isAdmin);
-                $this->session->set_userdata('logged_in', $sess_array);
+                $this->session->set_userdata($sess_array);
             }
           
             return $result;
@@ -50,6 +50,9 @@
                 case 'shot' : $parent = 'scene';        break;
                 case 'scene': $parent = 'project';      break;
                 case 'project': return ($this->db_model->get_single('project', array('title'=>$title, 'project_id !='=>$section_id)) === false);
+				case 'workflow': return ($this->db_model->get_single('workflow', array('title'=>$title, 'workflow_id !='=>$section_id)) === false);
+				case 'workflowtask': return ($this->db_model->get_single('workflowstructure', array('task_title' => $title,
+																								 'workflow_id' => $section_id)) === false);
             }
     
             if($data[2] == 'create')
@@ -69,13 +72,13 @@
 		 * checks if the given shortcode is unique
 		 * @param String $shortcode shortcode to check
 		 */
-        public function shortcode($shortcode)
+        public function shortcode($shortcode, $project_id = false)
         {
             $this->form_validation->set_message('check->shortcode', 'Shortcode already exists');
-            $id = $this->input->post('id');
-            if($id === false)
+            // $id = $this->input->post('section_id');
+            if($project_id === false)
                 return ($this->db_model->get_single('project', "shortcode = '$shortcode'", 'title') === false);
-            return ($this->db_model->get_single('project', "shortcode = '$shortcode' AND project_id != $id", 'title') === false);
+            return ($this->db_model->get_single('project', "shortcode = '$shortcode' AND project_id != $project_id", 'title') === false);
         }
         
 		/**
@@ -96,7 +99,7 @@
         public function password($password, $user)
         {
             $this->form_validation->set_message('check->password', 'Wrong Password');
-            return ($this->db_model->get('user', array('username'=>$user, 'password'=>md5($password))) !== false);
+            return ($this->db_model->get_single('user', array('username'=>$user, 'password'=>md5($password))) !== false);
         }
         
 		/**
@@ -110,7 +113,7 @@
             $this->form_validation->set_message('check->username','Username already exists');
             if($username == $oldname)
                 return true;
-            return ($this->db_model->get('user', array('username'=>$username)) !== false);
+            return ($this->db_model->get('user', "username = '$username'") !== false);
         }
         
 		/**
@@ -120,9 +123,9 @@
 		 */
         public function secure_password($password)
         {
-            $this->form_validation->set_message('check->secure_password', 'Password has to contain at least one capital letter and one number');
+            $this->form_validation->set_message('check->secure_password', 'Your new password has to contain at least one capital letter and one number');
             if($password == '')
-                return true;
+                return false;
             return (preg_match("/[0-9]+/",$password) && preg_match("/[A-Z]+/",$password) && strlen($password) >= 6);
         }
 
@@ -136,7 +139,7 @@
         {
             $data = explode(',', $data);
             
-            $this->form_validation->set_message('check->setting', 'Title already in use');
+            $this->form_validation->set_message('check->setting', 'Name already in use');
             return !$this->db_model->get_single($data[0], array('title'=>$title, $data[0].'_id !='=>$data[1]));
         }
     }

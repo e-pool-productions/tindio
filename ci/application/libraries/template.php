@@ -12,11 +12,11 @@
         
         public function load($content, $data = null)
         {
-        	$session = $this->ci -> session->userdata('logged_in');
-			$data['isAdmin'] = $session['isAdmin'];
-			// If user is admin, it doesn't matter whether he is director or not 
-			$data['isDirector'] = $data['isAdmin'] ? TRUE : $this ->ci->permission->isDirector();
-			$data['gravatar_url'] = $session['gravatar_url'];
+			if(!isset($data['isAdmin']))	
+				$data['isAdmin'] = $this->ci->permission->isAdmin();
+			if(!isset($data['isDirector']))
+				$data['isDirector'] = $this ->ci->permission->isDirector();
+			$data['gravatar_url'] = $this->ci->session->userdata('gravatar_url');
             
             $data['content'] = $this->ci->load->view($content, $data, true);
             

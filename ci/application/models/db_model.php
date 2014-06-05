@@ -47,12 +47,12 @@
 		}		
 		
 		
-		public function get_distinct($from, $where = null, $select = null, $distinct=null)
+		public function get_distinct($from, $where = null, $select = null)
         {
             if(!is_null($select))
                 $this->db->select($select);
-			if($distinct)
-				$this->db->distinct();
+			
+			$this->db->distinct();
             $query = isset($where) ? $this->db->get_where($from, $where) : $this->db->get($from);   
             return $query->result_array();
         }

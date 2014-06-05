@@ -37,53 +37,54 @@
 		/**
 		 * Displays the myWork-page
 		 */
-        function work()
+        function work($data = null)
         {
             // function available to every user
             $this->load->library('table');
             $this->load->helper('form');
             $this->load->model(array('page_model', 'section_model', 'assets'));
             
-            $session = $this->session->userdata('logged_in');
+            $works = isset($data['works']) ? $data['works'] : $this->mystuff_model->getWork($this->session->userdata('user'));
+			unset($data['works']);
             
-            $data = $this->mystuff_model->getWork($session['user']);
-            
-            // TODO: $data[pos]['status']['title'] and not $data['pos']['status'] !!!
-            $this->table->set_template($this->page_model->get_table_template('mytasks'));
+            $this->table->set_template(array('table_open' => '<table class="table table-bordered">'));
                                 
             $this->table->set_heading(array('0' => array('data' => 'Title'),
                                             '1' => array('data' => 'Type'),
-                                            '2' => array('data' => 'Code', 'style'=>'width:175px;'),
+                                            '2' => array('data' => 'Code'),
                                             '3' => array('data' => 'Project'),
-                                            '4' => array('data' => 'Status', 'style' =>'min-width: 120px'),
-                                            '5' => array('data' => 'Details', 'style'=>'width: 160px'),
+                                            '4' => array('data' => 'Status'),
+                                            '5' => array('data' => 'Details'),
                                             '6' => array('data' => 'Files'),
                                             '7' => array('data' => 'Description')
                                             ));
-            if(!is_null($data))
+            if(!empty($works))
             {
-                foreach($data as $work_item)
+                foreach($works as $work)
                 {   
-                    $status = $this->section_model->get_status($work_item['status']);
-                    $color = $status['color'];
-                    $status = $status['status'];
+                    $status = $this->section_model->get_status($work['status']);
                     
                     $row = array(
-                            '0' => array('data' => '<div style=\'overflow-x:auto\'><a href="'.$work_item['link'].'">'.$work_item['title'].'</div>','style'=>'max-width:175px; text-align:left'),
-                            '1' => array('data' => $work_item['type']),
-                            '2' => array('data' => '<div style=\'overflow-x:auto\'>'.$work_item['code'].'</div>', 'style'=>'max-width:175px'),
-                            '3' => array('data' => '<div style=\'overflow-x:auto\'><a href="projects/view/'.$work_item['project']['project_id'].'">'.$work_item['project']['title'].'</div>', 'style'=>'max-width:175px; text-align:left'),
-                            '4' => array('data' => $status, 'style'=>'color:'.$color.'; min-width: 85px;'),
-                            '5' => array('data' => 'DEADLINE - '.$work_item['deadline'].br(1).' Started in '.$work_item['startdate'].br(1).' Ended in '.$work_item['enddate'].br(1).'Duration: '.$work_item['duration']),
-                            '6' => array('data' => $work_item['assets']),
-                            '7' => array('data' => '<div style=\'overflow-x:auto\'>'.$work_item['description'].'</div>', 'style'=>'max-width:175px')
+                            '0' => array('data' => '<div style=\'overflow-x:auto\'><a href="'.$work['link'].'">'.$work['title'].'</div>', 'class' => 'wordwrap'),
+                            '1' => array('data' => $work['type']),
+                            '2' => array('data' => '<div style=\'overflow-x:auto\'>'.$work['code'].'</div>', 'class' => 'wordwrap'),
+                            '3' => array('data' => '<div style=\'overflow-x:auto\'><a href="'.base_url('projects/view/'.$work['project']['project_id']).'">'.$work['project']['title'].'</div>', 'class' => 'wordwrap'),
+                            '4' => array('data' => $status),
+                            '5' => array('data' => 'DEADLINE - '.$work['deadline'].br(1).'
+                            						Started: '.$work['startdate'].br(1).'
+                            						Ended: '.$work['enddate'].br(1).'
+                            						Duration: '.$work['duration']),
+                            '6' => array('data' => $work['assets']),
+                            '7' => array('data' => '<div style=\'overflow-x:auto\'>'.$work['description'].'</div>', 'class' => 'wordwrap')
     
                             ); 
                     $this->table->add_row($row);
                 }
             }
-            $data['table'] = $this->table->generate();
+            $data['myWorkTable'] = !empty($works) ? $this->table->generate() : '';
             $data['title'] = 'My Work';
+			if(!isset($data['filter']))
+				$data['filter'] = '';
             
             $this->template->load('mystuff/work', $data);
         }
@@ -95,21 +96,22 @@
         {
             // function available to every user
             $this->load->model('page_model');
-            
-            $session = $this->session->userdata('logged_in');
-            
-            $data['news'] = $this->page_model->get_news($session['user']);
+			
+			$user = $this->session->userdata('user');
+
+            $data['news'] = $this->page_model->get_news($user);
             
             $this->load->library('table');
+			
+			$this->table->set_template(array('table_open' => '<table class="table table-bordered">'));
             
-            $this->table->set_template($this->page_model->get_table_template('dashboard_tasks'));
+            // $this->table->set_template($this->page_model->get_table_template('dashboard_tasks'));
             
-            $this->table->set_heading(array('0' => array('data' => 'Code'),
-                                            '1' => array('data' => 'Task'),
-                                            '2' => array('data' => 'Deadline')
-                                    ));
+            $this->table->set_heading(array(array('data' => 'Code'),
+                                            array('data' => 'Task'),
+                                            array('data' => 'Deadline')));
             
-            $deadlines = $this->page_model->get_deadlines($session['user']);
+            $deadlines = $this->page_model->get_deadlines($user);
             foreach($deadlines as $deadlines_item)
             {
                 $row = array(   '0' => array('data' => '<div style=\'overflow-x:auto\'>'.$deadlines_item['code'].'</div>', 'style'=>'max-width:175px'),
@@ -121,86 +123,97 @@
             $data['deadlines'] = $this->table->generate();
             
             $data['globalstats'] = $this->page_model->get_globalstats();
-            $data['number_of_new_assignments'] = $this->page_model->get_new_assignments($session['user']);
+            $data['number_of_new_assignments'] = $this->page_model->get_new_assignments($user);
             $data['title'] = 'Home';
 
             $this->template->load('mystuff/dashboard', $data);
         }
 
-        // TODO
-        // /**
-         // * applies the filter to the user table
-         // * 
-         // * @param $filter 
-         // */
-        // public function filterform($filter = null)
-        // {
-            // $field = $this->input->post('fields');
-//             
-            // if(is_null($filter))
-                // $filter = $this->input->post('filter_terms');
-// 
-            // if($filter == '' || $field == 'No_Select')
-                // redirect('users');
-//                 
-            // $data['users'] = $this->filter($field, $filter);
-            // $data['filter'] = $filter;            
-            // $this->overview($data);
-        // }
-// 
-        // /**
-         // * filters dependent on the given field and filter_terms
-         // * 
-         // * @param String $field field to filter, default null
-         // * @param String $filter <filter_term>,<filter_term>,<filter_term>
-         // * 
-         // * 
-         // */
-        // public function filter($field = null, $filter = null)
-        // {
-            // if(is_null($filter) || $filter == '' || $field == 'No_Select')
-                // return;
-//             
-            // $filter_terms = array_unique(array_map('trim', explode(',', $filter)));
-//             
-            // switch($field)
-            // {
-                // case 'roles':
-                    // $users = $this->db_model->get('user');
-//                     
-                    // if(in_array('admin', array_map('strtolower', $filter_terms)))
-                        // $admins = array_map(function($ele){return $ele['username'];}, $this->db_model->get('admin'));
-// 
-                    // $amount = count($users);
-// 
-                    // for($i = 0; $i < $amount; $i++)
-                    // {
-                        // if(isset($admins) && in_array($users[$i]['username'], $admins))
-                            // continue;
-//                         
-                        // $upr = array_map(function($ele){return strtolower($ele['role_title']);}, 
-                                         // $this->section_get_model->get_userprojectrole($users[$i]['username']));
-//                                          
-                        // if(!array_intersect(array_map('strtolower', $filter_terms), $upr))
-                            // unset($users[$i]);
-                    // }
-// 
-                    // return $users;
-                // case 'projects':
-                    // $project_ids = array_map(   function($ele){return $ele['project_id'];},
-                                                // $this->db_model->get(   'project p',
-                                                                        // 'p.title REGEXP "' . implode('(.*)|(.*)', $filter_terms).'"',
-                                                                        // 'project_id'));
-                    // $users = array();
-                    // foreach($project_ids as $project_id)
-                        // $users = array_merge($users, $this->section_get_model->get_users('project', $project_id));
-// 
-                    // return array_unique($users, SORT_REGULAR);
-                // default:
-                    // $filter_conditions = $filter_terms; break;
-            // }
-// 
-            // return empty($filter_conditions) ? array() : $this->db_model->get('user', "$field REGEXP '" . implode('(.*)|(.*)', $filter_conditions) . "' ORDER BY $field");
-        // }
+        /**
+         * applies the filter to the user table
+         * 
+         * @param $filter 
+         */
+        function filterform($filter = null)
+        {
+            $field = $this->input->post('fields');
+            
+            if(is_null($filter))
+                $filter = $this->input->post('filter_terms');
+
+            if($filter == '' || $field == 'No_Select')
+                redirect('mystuff/work');
+            
+			$this->load->model(array('page_model', 'section_model', 'assets'));   
+			
+            $data['works'] = $this->filter($field, $filter);
+            $data['filter'] = $filter;            
+            $this->work($data);
+        }
+
+        /**
+         * filters dependent on the given field and filter_terms
+         * 
+         * @param String $field field to filter, default null
+         * @param String $filter <filter_term>,<filter_term>,<filter_term>
+         * 
+         * 
+         */
+        function filter($field = null, $filter = null)
+        {
+            if(is_null($filter) || $filter == '' || $field == 'No_Select')
+                return;
+            
+            $filter_terms = array_filter(array_unique(array_map('trim', explode(',', $filter))));
+
+			if(empty($filter_terms))
+				return $this->work();
+            
+            switch($field)
+            {
+				case 'type':
+					$sections = array('task', 'shot', 'scene');
+					foreach ($filter_terms as $filter_term)
+                        $filter_conditions = preg_grep("/$filter_term(\w+)/i", $sections);
+					
+					return empty($filter_conditions) ? array() : $this->mystuff_model->getWork($this->session->userdata('user'), $filter_conditions);
+				case 'project':
+					foreach ($filter_terms as $filter_term)
+                    {
+                        $projects = $this->db_model->get('project', "title LIKE '%$filter_term%'");
+                        foreach ($projects as $project)
+                            $filter_conditions[] = $project['project_id'];
+                    }
+					
+					return empty($filter_conditions) ? array() : $this->mystuff_model->getWork($this->session->userdata('user'), null, 'project_id IN ('.implode(',', $filter_conditions).')');
+				case 'status':
+					$filter_terms = array_map(function($ele){return str_replace(' ', '_', $ele);}, $filter_terms);
+					
+					foreach ($filter_terms as $filter_term)
+                    {
+                        $status = $this->db_model->get('status', "title LIKE '%$filter_term%'");
+                        foreach ($status as $sta)
+                            $filter_conditions[] = $sta['status_id'];
+                    }
+					
+					return empty($filter_conditions) ? array() : $this->mystuff_model->getWork($this->session->userdata('user'), null, 'status_id IN ('.implode(',', $filter_conditions).')');
+				case 'startdate':
+                    foreach ($filter_terms as $filter_term)
+                        $filter_conditions[] = "startdate LIKE '$filter_term%'";
+					return empty($filter_conditions) ? array() : $this->mystuff_model->getWork($this->session->userdata('user'), null, implode(' OR ', $filter_conditions));
+                    
+                case 'enddate':
+                    foreach ($filter_terms as $filter_term)
+                        $filter_conditions[] = "enddate LIKE '$filter_term%'";
+					return empty($filter_conditions) ? array() : $this->mystuff_model->getWork($this->session->userdata('user'), null, implode(' OR ', $filter_conditions));
+				case 'files':
+					
+                default:
+                    $filter_conditions = $filter_terms; break;
+            }
+
+            return empty($filter_conditions) ? array() : $this->mystuff_model->getWork($this->session->userdata('user'), null, "$field REGEXP '" . implode('(.*)|(.*)', $filter_conditions) . "' ORDER BY $field"); 
+            //$this->db_model->get('user', "$field REGEXP '" . implode('(.*)|(.*)', $filter_conditions) . "' ORDER BY $field");
+        }
     }
-?>     
+?>

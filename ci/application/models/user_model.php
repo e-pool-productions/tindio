@@ -3,199 +3,203 @@
 	 * model for the all-users and edit profile pages
 	 */
 	class user_model extends CI_Model
-	{		
-		/**
-		 * adds the person ($username) either to the project (if $type = 'project') as an project observer
-		 * or assigns the person to the given duty ($type, $id)
-		 * 
-		 * @param String $username name of the person to recruit
-		 * @param String $type task/shot/scene/project
-		 * @param Integer $id id of the duty to assign the person to
-		 */
-		public function recruit($username, $type, $id)
-		{
-			$session = $this->session->userdata('logged_in');
-			if(!isset($session['user']))
-			{
-				redirect('login');
-			}
-			
-			$admin = count($this->db_model->get('admin',array('username'=>$session['user'])))==1;
-			$director = count($this->db_model->get('userproject',array('username'=>$session['user'])))>0;
-			if(!($admin || $director))
-			{
-				echo 'You don\'t have the rights to recruit someone!';
-				return;
-			}
-			if($type != 'task' && $type != 'shot' && $type != 'scene' && $type != 'project')
-			{
-				echo 'bad type'; return;
-			}
-			
-			if(count($this->db_model->get('user',array('username'=>$username)))==0)	//TODO: This might be where 'no invites' can go
-			{
-				echo 'user not found!';
-				return;
-			}
-			if(count($this->db_model->get($type, array($type.'_id'=>$id)))==0)
-			{
-				echo 'invalid '.$type.' id!'; return;
-			}
-			if(count($this->db_model->get('user'.$type, array($type.'_id'=>$id, 'username'=>$username)))>0)
-			{
-				echo 'user already assigned'; return;
-			}
-			
-			if($type != 'project')
-				$this -> db_model ->insert('user'.$type, array($type.'_id'=>$id, 'username'=>$username)); 
-			else 
-				$this->assign_to_project($username, $id);	
-			
-			if($type == 'task')
-			{
-				$task = $this -> db_model -> get_single('task', array('task_id' => $id));
-				if($task['status_id'] == 0)
-					$this -> db_model ->update('task', array('task_id' => $id), array('status_id' => 1));
-				$newAssignments =$this->db_model->get_single('user', array('username'=>$username), 'newassignments');
-				$newAssignments = $newAssignments['newassignments']+1;
-				$this->db_model->update('user', array('username'=>$username), array('newassignments'=>$newAssignments));
-				
-			}
-		}
+	{
+		
+        /**
+         * generates a password
+         * 
+         * @return String generated password
+         */
+        function generate_pw()
+        {
+            $pw = '';
+            for ($i=0; $i < 10; $i++) { 
+                $pw.= chr(mt_rand(97, 122));
+            }
+            $num_index = mt_rand(0,10);
+            $pw[$num_index] = chr(mt_rand(48, 57));
+            $cap_index = mt_rand(0,10);
+            while($cap_index == $num_index)
+            {
+                $cap_index = mt_rand(0,10);
+            }
+            $pw[$cap_index] = chr(mt_rand(65, 90));
+            return $pw;
+        }
+
+        /**
+         * sends a welcome mail to a given user
+         * 
+         * @param Array $user user to send the welcome mail to 
+         */
+        function sendWelcomeMail($user)
+        {
+            $admin = $this -> db_model -> get_single('user', array('username' => $this->session->userdata('user')));
+            
+            $this->load->library('email');
+            $this->email->from($admin['mail'], $admin['firstname'] . ' ' .$admin['lastname']);
+            $this->email->to($user['mail']);
+            $this->email->subject('Welcome to our Film-Project');
+            
+            $this->email->message("Hi " . $user['firstname'] .' '.$user['lastname']. ",\n\nWelcome to Tindio @ ".base_url()." \n \nYour email was used to create an account with the following data:\n".
+            "\nUsername: ".$user['username'].
+            "\nFirstname: ".$user['firstname'].
+            "\nLastname: ".$user['lastname'].
+            "\nPasswort: ".$user['password'].
+            "\nEmail: ".$user['mail'].
+            "\n\nPlease log in and edit your profile (check the right side of the top menu to change your password)".
+            "\n\nHave fun with Tindio!".
+            "\n\nYours truly".
+            "\n\nAdmin");
+            $this->email->send();
+
+            //Comment in to see the report
+            //echo $this->email->print_debugger();
+        }
 
 		/**
-		 * adds the person ($username) to the project ($id) as observer
-		 * @param String $username name of the person to add to the project
-		 * @param Integer $id id of the project to add the person to
+		 * adds the person ($username) either to the project (if $section = 'project') as an project observer
+		 * or assigns the person to the given duty ($section, $section_id)
+		 * 
+		 * @param String $username name of the person to recruit
+		 * @param String $section task/shot/scene/project
+		 * @param Integer $section_id id of the duty to assign the person to
 		 */
-		public function assign_to_project($username, $id)
+		function recruit($username, $section, $section_id)
 		{
-			//TODO: check data again!
-			if(count($this->db_model->get('projectobserver', array('project_id'=>$id, 'username'=>$username)))>0)
+			$isAdmin = $this->permission->isAdmin();
+			$isDirector = $this->permission->isDirector();			
+
+			if(!$isAdmin && !$isDirector || !in_array($section, array('task', 'shot', 'scene', 'project')) ||
+				!$this->db_model->get_single('user', "username = '$username'", 'username') ||
+				!$this->db_model->get_single($section, $section."_id = $section_id", 'title') ||
+				$this->db_model->get_single('user'.$section, $section."_id = $section_id AND username = '$username'", 'username'))
+			{
+				echo 'Maybe something went wrong? (umZ22-25)';
 				return;
-			$this->db_model->insert('projectobserver', array('project_id'=>$id, 'username'=>$username)); 
+			}
+
+			if($section != 'project')
+				$this -> db_model ->insert('user'.$section, array($section.'_id'=>$section_id, 'username'=>$username)); 
+			elseif(!$this->db_model->get_single('projectobserver', "project_id = $section_id AND username = '$username'", 'project_id'))
+				$this->db_model->insert('projectobserver', array('project_id'=>$section_id, 'username'=>$username));
+			
+			if($section == 'task')
+			{
+				$task = $this -> db_model -> get_single('task', "task_id = $section_id");
+				if($task['status_id'] == STATUS_UNASSIGNED)
+					$this -> db_model ->update('task', "task_id = $section_id", array('status_id' => STATUS_PRE_PRODUCTION));
+				$nA = $this->db_model->get_single('user', array('username'=>$username), 'newassignments');
+				$this->db_model->update('user', "username = '$username'", array('newassignments' => $nA['newassignments'] + 1));
+			}
 		}
 
 		/**
 		 * 	unassigns a given user from a specified item
 		 * 
 		 * @param String $username name of the person to dissociate
-		 * @param String $type type of the duty to dissociate the person from
-		 * @param Integer $id id of the duty to dissociate the person from
+		 * @param String $section type of the duty to dissociate the person from
+		 * @param Integer $section_id id of the duty to dissociate the person from
 		 * @return TRUE if user was unassigned
 		 */
-		public function unassign($username, $type, $id)
+		function unassign($username, $section, $section_id)
 		{
-			if($id == false)
-			{
-				echo "no duty specified!";
-				//redirect('users/show_users');
-				//return;
-			}
-			$session = $this->session->userdata('logged_in');
-			$logged_in_user = $session['user'];
+			switch($section)
+            {
+                case 'project':
+                    $this->db_model->destroy('projectobserver', "project_id = $section_id");
+                    
+                    $data['scene'] = array_map(function($el){ return $el['scene_id']; }, $this->db_model->get('scene', "project_id = $section_id", 'scene_id'));
+                case 'scene':
+                    $data['shot'] = array_map(function($el){ return $el['shot_id']; }, $this->db_model->get('shot', $section."_id = $section_id", 'shot_id'));
+                case 'shot':
+                    if($section == 'scene')
+                        $data['task'] = array_map(function($el){ return $el['task_id']; }, $this->db_model->get('task t, shot sh', "t.shot_id = sh.shot_id AND sh.scene_id = $section_id", 'task_id'));
+                    else
+                        $data['task'] = array_map(function($el){ return $el['task_id']; }, $this->db_model->get('task', $section."_id = $section_id", 'task_id'));
+                    break;
+            }
+            $data = array_reverse($data);
+			$data[$section] = array($section_id);
 			
-			if($type != 'task' && $type != 'shot' && $type != 'scene' && $type != 'project')
-				{echo 'bad type'; return FALSE;}
-			if(count($this->db_model->get('user',array('username'=>$username)))==0)
-				{echo 'user not found!'; return FALSE;}
-			if(count($this->db_model->get($type, array($type.'_id'=>$id)))==0)
-				{echo 'invalid '.$type.' id! ('.$id.')'; return FALSE;}
-			$project_id = -1;
-			switch($type)
-			{
-				case 'task': $project_id = $this->db_model->get_single('task', 'task_id = "'.$id.'"', 'project_id'); break;
-				case 'shot': $project_id = $this->db_model->get_single('shot', 'shot_id = "'.$id.'"', 'project_id'); break;
-				case 'scene': $project_id = $this->db_model->get_single('scene', array('scene_id'=>$id), 'project_id'); break;
-				case 'project': $project_id = array('project_id'=>$id);
-			}
-			$project_id = $project_id['project_id'];
-			$admin = $session['isAdmin'];
-			$dir_temp =$this->db_model->get('userproject',array('username'=>$logged_in_user, 'project_id'=>$project_id));
-			$director = !empty($dir_temp);
-			echo $project_id;
-			if(!$admin && !$director)
-			{echo 'You don\'t have the rights to unassign.'; return FALSE;}
-
-			switch($type)
-			{
-				case 'task': $this->unassign_from_task($username, $id); break;
-				case 'shot': $this->unassign_from_shot($username, $id); break;
-				case 'scene':$this->unassign_from_scene($username, $id);break;
-				case 'project':$this->unassign_from_project($username, $id);break;
-			}
-			return TRUE;
+			foreach($data as $subSec => $ids)
+            {
+                if(empty($ids))
+                    continue;
+				
+				if($subSec == 'task')
+				{
+					$task = $this->db_model->get_single('task', "task_id = $section_id", 'status_id');
+					
+					//Users assigned?
+					if(!$this->db_model->get_single('usertask', "task_id = $section_id", 'task_id') && $task['status_id'] == STATUS_PRE_PRODUCTION)
+						$this -> db_model -> update('task', array('task_id' => $section_id), array('status_id' => STATUS_UNASSIGNED));
+				}
+                
+                $this->db_model->destroy('user'.$subSec, "username = '$username' AND ".$subSec.'_id IN ('.implode(',', $ids).')');
+            }
 		}
 
-		/**
-		 * dissociates the user ($username) from the task ($id)
-		 * 
-		 * @param String $username name of the user to dissociate
-		 * @param Integer $id id of the task to dissociate the user from
-		 */
-		private function unassign_from_task($username, $id)
+		function edit($username, $field, $optID)
 		{
-			$this->db_model->destroy('usertask', array('username'=>$username, 'task_id'=>$id), TRUE);
-			$usertask = $this->db_model->get('usertask', array('task_id' => $id));
+			if($field == "removeSkill" && !is_null($optID))
+			{
+				$this->db_model->destroy('userskill', "username = '$username' AND skill_id = $optID");
+				redirect("users/profile/$username");
+			}
+				
+			$newValue = $this->input->post('newValue');
 			
-			$task = $this -> db_model -> get_single('task', array('task_id' => $id));
-			
-			//Users assigned?
-			if(count($usertask)==0 && $task['status_id'] == 1)
-			{
-				$this -> db_model -> update('task', array('task_id' => $id), array('status_id' => 0));
-			}
+			if($newValue === false)
+				return 'No Value specified!';
+							
+            $this->load->library('form_validation');
+            $valNeeded = false;
+
+            switch($field)
+            {
+                case 'username' :      
+                    $this->form_validation->set_rules('newValue', 'Username', 'trim|xss_clean|alpha_dash|callback_check->username['.$username.']');
+                    $valNeeded = true; break;
+                case 'firstname':
+                    $this->form_validation->set_rules('newValue', 'First Name', 'required|trim|xss_clean');
+                    $valNeeded = true; break;
+				case 'lastname':
+                    $this->form_validation->set_rules('newValue', 'Last Name', 'required|trim|xss_clean');
+                    $valNeeded = true; break;
+				case 'mail':
+                    $this->form_validation->set_rules('newValue', 'E-Mail', 'trim|xss_clean|valid_email');
+                    $valNeeded = true; break;
+				case 'gravatar_email':
+                    $this->form_validation->set_rules('newValue', 'Gravatar E-Mail', 'trim|xss_clean|valid_email');
+                    $valNeeded = true; break;
+				case 'password':
+					$this->form_validation->set_rules('curpass', 'current password', 'required|trim|xss_clean|callback_check->password['.$username.']');
+                    $this->form_validation->set_rules('newValue', 'new password',  'trim|xss_clean|callback_check->secure_password');
+					$this->form_validation->set_rules('newpassconf','password confirmation','trim|xss_clean|matches[newValue]');
+					$this->form_validation->set_message('matches', 'The password confirmation does not match with your new password.');
+                    $valNeeded = true; break;
+            }
+            
+            if ($this->form_validation->run() == FALSE && $valNeeded)
+                echo validation_errors(' ', ' ');
+            else
+            {
+            	if($field == "addSkill")
+					$this->db_model->insert('userskill', array('username' => $username, 'skill_id' => $newValue));
+				else
+				{
+	            	switch($field)
+					{
+						case 'username': 		$this->session->set_userdata('user', $newValue); break;
+						case 'gravatar_email': 	$this->session->set_userdata('gravatar_url', $this->gravatar->get_gravatar($newValue)); break;
+						case 'password': 		$newValue = md5($newValue); break;
+					}
+					
+	               	$this->db_model->update('user', "username = '$username'", array($field => $newValue));
+				}
+				echo 'done';
+            }
 		}
-		
-		/**
-		 * dissociates the user ($username) from the shot ($id) and all tasks associated with the shot
-		 * 
-		 * @param String $username name of the user to dissociate
-		 * @param Integer $id id of the shot to dissociate the user from
-		 */
-		private function unassign_from_shot($username, $id)
-		{
-			$task_ids = $this->db_model->get('task', array('shot_id'=>$id), 'task_id');
-			foreach($task_ids as $task_id)
-			{
-				$this->unassign_from_task($username, $task_id['task_id']);
-			}
-			$this->db_model->destroy('usershot', array('username'=>$username, 'shot_id'=>$id), TRUE);
-		}
-		
-		/**
-		 * dissociates the user ($username) from the scene ($id) and all shots and tasks associated with the scene
-		 * 
-		 * @param String $username name of the user to dissociate
-		 * @param Integer $id id of the scene to dissociate the user from
-		 */
-		private function unassign_from_scene($username, $id)
-		{
-			$shot_ids = $this->db_model->get('shot', array('scene_id'=>$id), 'shot_id');
-			foreach($shot_ids as $shot_id)
-			{
-				$this->unassign_from_shot($username, $shot_id['shot_id']);
-			}
-			$this->db_model->destroy('userscene', array('username'=>$username, 'scene_id'=>$id));
-		}
-		
-		/**
-		 * dissociates the user ($username) from the project ($id) and all scenes, shots and tasks 
-		 * associated with the project
-		 * 
-		 * @param String $username name of the user to dissociate
-		 * @param Integer $id id of the project to dissociate the user from
-		 */
-		private function unassign_from_project($username, $id)
-		{
-			$scene_ids = $this->db_model->get('scene', array('project_id'=>$id), 'scene_id');
-			foreach($scene_ids as $scene_id)
-			{
-				$this->unassign_from_scene($username, $scene_id['scene_id']);
-			}
-			$this->db_model->destroy('userproject', array('username'=>$username, 'project_id'=>$id));
-			$this->db_model->destroy('projectobserver', array('username'=>$username, 'project_id'=>$id));
-		}
-		
 	}
 ?>

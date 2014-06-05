@@ -117,7 +117,7 @@ function mergeFile(blob) {
             mfilenum++;
             
             if(mfilenum == files.length)
-                submit();
+                submitForm(true);
         }
     };
     

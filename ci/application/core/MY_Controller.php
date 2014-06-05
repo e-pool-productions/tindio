@@ -6,14 +6,14 @@
             parent::__construct();
             session_start();
             
-            $session = $this->session->userdata('logged_in');
+            $user = $this->session->userdata('user');
             
-            if($session === FALSE)
+            if($user === FALSE)
             {
                 redirect("login");
             }
             $this->load->helper('date');
-            $tz = $this->db_model->get_single('user', 'username = "'.$session['user'].'"', 'timezone');
+            $tz = $this->db_model->get_single('user', "username = '$user'", 'timezone');
             date_default_timezone_set($this->timezone_by_offset(timezones($tz['timezone'])));
         }
         
