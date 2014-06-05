@@ -14,7 +14,7 @@ Tindio is a very simple and easy to use platform. All you need is
 (To use all the functions of Tindio Javascript has to be enabled in your browser)
 
 ### How to install?
-Download the .zip file and unpack it. Next go to application/config/constants.php and change the url of
+Download the .zip file and unpack it. Next go to ci/application/config/constants.php and change the url of
 ```
 define('URL', 'http://localhost/tindio/ci');
 ```
@@ -25,12 +25,14 @@ define('URL', 'http://www.example.com');
 
 (NOTICE! SINCE YOU WILL DEAL WITH DIFFERENT ACCOUNTS IT'S HIGHLY RECOMMENDED TO USE SSL FOR MORE SECURITY! WE CAN'T PROVIDE THAT FOR YOU!)
 
-Now go to application/config/database.php and fill the following with your information:
+Now go to ci/application/config/database.php and fill the following with your information:
 ```
 $db['default']['hostname'] = 'localhost';       // your database hostlocation (normally localhost)
 $db['default']['username'] = 'username';        // your database username
 $db['default']['password'] = 'password';        // your database password
-$db['default']['database'] = 'tindio';          // the name of your database
+$db['default']['database'] = 'tindio';          // the name of the database
+                                                // (if you dont want to change the name
+                                                //  of the database just leave it as it is)
 ```
 Please keep the ' and just change the information inside after the equals.
 
