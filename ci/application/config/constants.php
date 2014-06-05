@@ -46,10 +46,15 @@ define('FOPEN_READ_WRITE_CREATE_STRICT',		'x+b');
 */
 
 define('URL', 'http://localhost/tindio/ci/');
-define('IMG', URL.'img/');
 define('CSS', URL.'css/');
 define('JS', URL.'js/');
 define('MEDIA', URL.'media/');
+
+/*
+|--------------------------------------------------------------------------
+| Project, Scene, Shot, Task Status
+|--------------------------------------------------------------------------
+*/
 
 define('STATUS_UNASSIGNED'		, 0);
 define('STATUS_PRE_PRODUCTION'	, 1);
@@ -57,11 +62,23 @@ define('STATUS_IN_PROGRESS'		, 2);
 define('STATUS_FOR_APPROVAL'	, 3);
 define('STATUS_FINISHED'		, 4);
 
+/*
+|--------------------------------------------------------------------------
+| Log Types
+|--------------------------------------------------------------------------
+*/
+
 define('LOGTYPE_NEW_PROJECT'	, 0);
 define('LOGTYPE_NEW_USER'		, 1);
 define('LOGTYPE_DELETE_PROJECT'	, 2);
 define('LOGTYPE_DELETE_USER'	, 3);
 define('LOGTYPE_FINISH_PROJECT' , 4);
+
+/*
+|--------------------------------------------------------------------------
+| Asset Types
+|--------------------------------------------------------------------------
+*/
 
 define('VIDEO',		0);
 define('AUDIO',		1);
@@ -69,6 +86,21 @@ define('3D_MODEL',	2);
 define('IMAGE', 	3);
 define('LINK',		4);
 define('OTHER',		5);
+
+/*
+|--------------------------------------------------------------------------
+| Basic Edit- and Deleteicons
+|--------------------------------------------------------------------------
+*/
+
+define('EDIT_ICON', '<i class="fa fa-pencil" title="editable"></i>');
+define('DELETE_ICON', '<i class="fa fa-times"></i>');
+
+/*
+|--------------------------------------------------------------------------
+| Supported Assetformats
+|--------------------------------------------------------------------------
+*/
 
 define('FORMATS',	'JPEG, PNG, GIF, PDF, BMP, OBJ, MP4, OGG, OGV, MP3, WEBM');
 /* End of file constants.php */
